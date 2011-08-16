@@ -494,7 +494,7 @@ buster.testCase("buster-configuration config", {
         "should get all by environment": function () {
             this.config.addGroup({ environment: "node", load: [] });
             this.config.addGroup({ environment: "node", load: [] });
-            this.config.addGroup({ environment: "browsers", load: [] });
+            this.config.addGroup({ environment: "browser", load: [] });
 
             assert.equals(this.config.configsFor("node").length, 2);
             assert.equals(this.config.configsFor("node")[0].environment, "node");
@@ -504,7 +504,7 @@ buster.testCase("buster-configuration config", {
         "should enumerate all by environment": function () {
             this.config.addGroup({ environment: "node", load: [] });
             this.config.addGroup({ environment: "node", load: [] });
-            this.config.addGroup({ environment: "browsers", load: [] });
+            this.config.addGroup({ environment: "browser", load: [] });
             var results = [];
 
             this.config.eachGroup("node", function (err, config) {
@@ -541,7 +541,7 @@ buster.testCase("buster-configuration config", {
             buster.extend(this.globs, { "src/*.js": ["src/1.js", "src/2.js"] });
 
             this.config.addGroup({ environment: "node", sources: ["src/*.js"] });
-            this.config.addGroup({ environment: "browsers", libs: ["src/*.js"] });
+            this.config.addGroup({ environment: "browser", libs: ["src/*.js"] });
             var results = 0;
 
             this.config.eachGroup(function (err, config) {
