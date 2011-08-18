@@ -351,6 +351,20 @@ buster.testCase("buster-configuration config", {
             });
         },
 
+        "should explicitly load files before existing ones": function (done) {
+            this.config.addGroup({
+                environment: "browser",
+                resources: ["src/1.js"],
+                load: ["lib/1.js"]
+            }).configure().then(function (c) {
+                done(function () {
+                    c.sessionConfig.loadFirst("src/1.js");
+                    assert.equals(c.sessionConfig.loadResources,
+                                  ["/src/1.js", "/lib/1.js"]);
+                });
+            });
+        },
+
         "human readable errors": {
             "should fail when resources is object": function (done) {
                 this.config.addGroup({
