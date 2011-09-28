@@ -400,7 +400,7 @@ buster.testCase("buster-configuration session", {
 
             this.session.load("/src/buster.js");
 
-            assert.notCalled(this.session.addResource);
+            refute.called(this.session.addResource);
         },
 
         "should throw when loading non-existent resource without content": function () {
@@ -526,10 +526,10 @@ buster.testCase("buster-configuration session", {
                 this.session.configure().then(done);
 
                 fs.readFile.getCall(0).args[2](null, "a.js");
-                assert.notCalled(done);
+                refute.called(done);
 
                 fs.readFile.getCall(1).args[2](null, "b.js");
-                assert.notCalled(done);
+                refute.called(done);
 
                 fs.readFile.getCall(2).args[2](null, "c.js");
                 assert.calledOnce(done);
