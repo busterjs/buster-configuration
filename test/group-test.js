@@ -6,7 +6,8 @@ var bcGroup = require("../lib/group");
 buster.testCase("buster-configuration group", {
     "should create resources with root path": function (done) {
         var group = bcGroup.create({resources: ["foo.js", "bar.js"]}, __dirname + "/fixtures");
-        group.resolve().then(function () {
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
             done();
@@ -15,7 +16,8 @@ buster.testCase("buster-configuration group", {
 
     "should get file contents as actual content": function (done) {
         var group = bcGroup.create({resources: ["foo.js"]}, __dirname + "/fixtures");
-        group.resolve().then(function () {
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
                 assert.equals(resource.content, "var thisIsTheFoo = 5;");
@@ -26,7 +28,8 @@ buster.testCase("buster-configuration group", {
 
     "should resolve globs": function (done) {
         var group = bcGroup.create({resources: ["*.js"]}, __dirname + "/fixtures");
-        group.resolve().then(function () {
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
 
