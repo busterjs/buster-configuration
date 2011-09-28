@@ -62,5 +62,18 @@ buster.testCase("buster-configuration group", {
                 done();
             });
         });
+    },
+
+    "should set etag": function (done) {
+        var group = bcGroup.create({resources: ["foo.js"]}, __dirname + "/fixtures");
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
+            group.resourceSet.getResource("/foo.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert("etag" in resource);
+                // TODO: Should probably test more here.
+                done();
+            });
+       });
     }
 });
