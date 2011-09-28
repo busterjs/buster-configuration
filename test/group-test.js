@@ -23,4 +23,20 @@ buster.testCase("buster-configuration group", {
             });
         });
     },
+
+    "should resolve globs": function (done) {
+        var group = bcGroup.create({resources: ["*.js"]}, __dirname + "/fixtures");
+        group.resolve().then(function () {
+            assert("/foo.js" in group.resourceSet.resources);
+            assert("/bar.js" in group.resourceSet.resources);
+
+            group.resourceSet.getResource("/foo.js", function (err, resource) {
+                assert.isUndefined(err);
+                group.resourceSet.getResource("/bar.js", function (err, resource) {
+                    assert.isUndefined(err);
+                    done();
+                });
+            });
+        });
+    }
 });
