@@ -5,7 +5,12 @@ var bcGroup = require("../lib/group");
 
 buster.testCase("buster-configuration group", {
     "should create resources with root path": function (done) {
-        var group = bcGroup.create({resources: ["foo.js", "bar.js"]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                "foo.js",
+                "bar.js"
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
@@ -14,7 +19,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should get file contents as actual content": function (done) {
-        var group = bcGroup.create({resources: ["foo.js"]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                "foo.js"
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -25,7 +34,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should resolve globs": function (done) {
-        var group = bcGroup.create({resources: ["*.js"]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                "*.js"
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
@@ -41,7 +54,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should add resource as object with path": function (done) {
-        var group = bcGroup.create({resources: [{path:"foo.js"}]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                {path:"foo.js"}
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             done();
@@ -49,7 +66,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should respect custom headers": function (done) {
-        var group = bcGroup.create({resources: [{path:"foo.js",headers:{"X-Foo":"Bar"}}]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                {path:"foo.js",headers:{"X-Foo":"Bar"}}
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -60,7 +81,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should set etag": function (done) {
-        var group = bcGroup.create({resources: ["foo.js"]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                "foo.js"
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -72,7 +97,11 @@ buster.testCase("buster-configuration group", {
     },
 
     "should fail for missing file": function (done) {
-        var group = bcGroup.create({resources: ["/does/not/exist.js"]}, __dirname + "/fixtures");
+        var group = bcGroup.create({
+            resources: [
+                "/does/not/exist.js"
+            ]
+        }, __dirname + "/fixtures");
         group.resolve().then(function () {
         }, function (err) {
             assert.match(err, "ENOENT");
