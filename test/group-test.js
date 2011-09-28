@@ -144,7 +144,24 @@ buster.testCase("buster-configuration group", {
         group.resolve().then(function () {
             assert("/bundle.js" in group.resourceSet.resources);
             var resource = group.resourceSet.resources["/bundle.js"];
-            assert.equals(resource.combine, ["foo.js", "bar.js"]);
+            assert.equals(resource.combine, ["/foo.js", "/bar.js"]);
+            done();
+        });
+    },
+
+    "should add combined resources with glob pattern": function (done) {
+        var group = bcGroup.create({
+            resources: [
+                "foo.js",
+                "bar.js",
+                {path: "/bundle.js", combine: ["*.js"]}
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            assert(true);
+            var resource = group.resourceSet.resources["/bundle.js"];
+            assert.equals(resource.combine.sort(), ["/foo.js", "/bar.js"].sort());
             done();
         });
     }
