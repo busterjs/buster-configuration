@@ -1,0 +1,32 @@
+{
+    "name": "buster-configuration",
+    "version": "0.2.0",
+    "description": "Implements the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
+    "homepage": "http://busterjs.org/buster-configuration",
+    "author": {
+        "name": "Christian Johansen",
+        "email": "christian@cjohansen.no",
+        "url": "http://cjohansen.no"
+    },
+    "contributors": [{
+        "name": "August Lilleaas",
+        "email": "august.lilleaas@gmail.com",
+        "url": "http://augustl.com"
+    }],
+    "main": "./lib/buster-configuration",
+    "repository": {
+        "type": "git",
+        "url": "git://gitorious.org/buster/buster-configuration.git"
+    },
+    "dependencies": {
+        "buster-core": "~0.4",
+        "buster-promise": "~0.3",
+        "glob": "~2.0",
+        "buster-module-loader": "~0.2",
+        "buster-resources": "~0.1"
+    },
+    "devDependencies": {
+        "buster": "~0.2.0",
+        "rimraf": "~1"
+    }
+}
