@@ -41,5 +41,14 @@ buster.testCase("buster-configuration group", {
                 });
             });
         });
+    },
+
+    "should add resource as object with path": function (done) {
+        var group = bcGroup.create({resources: [{path:"foo.js"}]}, __dirname + "/fixtures");
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
+            assert("/foo.js" in group.resourceSet.resources);
+            done();
+        });
     }
 });
