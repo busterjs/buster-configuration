@@ -11,6 +11,7 @@ buster.testCase("buster-configuration group", {
                 "bar.js"
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
@@ -24,6 +25,7 @@ buster.testCase("buster-configuration group", {
                 "foo.js"
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -39,6 +41,7 @@ buster.testCase("buster-configuration group", {
                 "*.js"
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             assert("/bar.js" in group.resourceSet.resources);
@@ -59,6 +62,7 @@ buster.testCase("buster-configuration group", {
                 {path:"foo.js"}
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             assert("/foo.js" in group.resourceSet.resources);
             done();
@@ -71,6 +75,7 @@ buster.testCase("buster-configuration group", {
                 {path:"foo.js",headers:{"X-Foo":"Bar"}}
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -86,6 +91,7 @@ buster.testCase("buster-configuration group", {
                 "foo.js"
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -102,6 +108,7 @@ buster.testCase("buster-configuration group", {
                 "/does/not/exist.js"
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
         }, function (err) {
             assert.match(err, "ENOENT");
@@ -116,6 +123,7 @@ buster.testCase("buster-configuration group", {
                 {path:"foo",backend:"http://10.0.0.1/"}
             ]
         }, __dirname + "/fixtures");
+
         group.resolve().then(function () {
             assert("/foo" in group.resourceSet.resources);
             var resource = group.resourceSet.resources["/foo"];
