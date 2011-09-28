@@ -75,5 +75,15 @@ buster.testCase("buster-configuration group", {
                 done();
             });
        });
+    },
+
+    "should fail for missing file": function (done) {
+        var group = bcGroup.create({resources: ["/does/not/exist.js"]}, __dirname + "/fixtures");
+        group.resolve().then(function () {
+        }, function (err) {
+            assert.match(err, "ENOENT");
+            assert.match(err, "/does/not/exist.js");
+            done();
+        });
     }
 });
