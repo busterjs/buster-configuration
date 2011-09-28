@@ -50,5 +50,17 @@ buster.testCase("buster-configuration group", {
             assert("/foo.js" in group.resourceSet.resources);
             done();
         });
+    },
+
+    "should respect custom headers": function (done) {
+        var group = bcGroup.create({resources: [{path:"foo.js",headers:{"X-Foo":"Bar"}}]}, __dirname + "/fixtures");
+        group.resolve().then(function (err) {
+            assert.isUndefined(err);
+            group.resourceSet.getResource("/foo.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.match(resource.headers, {"X-Foo": "Bar"});
+                done();
+            });
+        });
     }
 });
