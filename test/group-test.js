@@ -79,5 +79,19 @@ buster.testCase("buster-configuration group", {
             assert.match(err, "/does/not/exist.js");
             done();
         });
+    },
+
+    "should add backend resource": function (done) {
+        var group = bcGroup.create({
+            resources: [
+                {path:"foo",backend:"http://10.0.0.1/"}
+            ]
+        }, __dirname + "/fixtures");
+        group.resolve().then(function () {
+            assert("/foo" in group.resourceSet.resources);
+            var resource = group.resourceSet.resources["/foo"];
+            assert.equals(resource.backend, "http://10.0.0.1/");
+            done();
+        });
     }
 });
