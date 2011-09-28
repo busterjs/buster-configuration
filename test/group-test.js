@@ -130,5 +130,22 @@ buster.testCase("buster-configuration group", {
             assert.equals(resource.backend, "http://10.0.0.1/");
             done();
         });
+    },
+
+    "should add combined resources": function (done) {
+        var group = bcGroup.create({
+            resources: [
+                "foo.js",
+                "bar.js",
+                {path: "/bundle.js", combine: ["foo.js", "bar.js"]}
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            assert("/bundle.js" in group.resourceSet.resources);
+            var resource = group.resourceSet.resources["/bundle.js"];
+            assert.equals(resource.combine, ["foo.js", "bar.js"]);
+            done();
+        });
     }
 });
