@@ -12,11 +12,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function () {
-            assert("/foo.js" in group.resourceSet.resources);
-            assert("/bar.js" in group.resourceSet.resources);
-            done();
-        });
+        assertContainsFooAndBar(group, done);
     },
 
     "should get file contents as actual content": function (done) {
@@ -42,18 +38,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function () {
-            assert("/foo.js" in group.resourceSet.resources);
-            assert("/bar.js" in group.resourceSet.resources);
-
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
-                group.resourceSet.getResource("/bar.js", function (err, resource) {
-                    assert.isUndefined(err);
-                    done();
-                });
-            });
-        });
+        assertContainsFooAndBar(group, done);
     },
 
     "should add resource as object with path": function (done) {
@@ -206,21 +191,29 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function () {
+        assertContainsFooAndBar(group, done, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
-
-            assert("/foo.js" in group.resourceSet.resources);
-            assert("/bar.js" in group.resourceSet.resources);
-
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
-                assert.equals(resource.content, "var thisIsTheFoo = 5;");
-                group.resourceSet.getResource("/bar.js", function (err, resource) {
-                    assert.isUndefined(err);
-                    assert.equals(resource.content, "var helloFromBar = 1;");
-                    done();
-                });
-            });
         });
     }
 });
+
+
+
+function assertContainsFooAndBar(group, done, extrasCallback) {
+    group.resolve().then(function () {
+        if (extrasCallback) extrasCallback();
+
+        assert("/foo.js" in group.resourceSet.resources);
+        assert("/bar.js" in group.resourceSet.resources);
+
+        group.resourceSet.getResource("/foo.js", function (err, resource) {
+            assert.isUndefined(err);
+            assert.equals(resource.content, "var thisIsTheFoo = 5;");
+            group.resourceSet.getResource("/bar.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "var helloFromBar = 1;");
+                done();
+            });
+        });
+    });
+}
