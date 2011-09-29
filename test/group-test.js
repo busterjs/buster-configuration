@@ -191,8 +191,9 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function () {
+        assertContainsFooAndBar(group, done, function (done) {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
+            done();
         });
     },
 
@@ -203,8 +204,9 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function () {
+        assertContainsFooAndBar(group, done, function (done) {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
+            done();
         });
     },
 
@@ -221,8 +223,9 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function () {
+        assertContainsFooAndBar(group, done, function (done) {
             // TODO: test that tests/my-testish.js is present.
+            done();
         });
     }
 });
@@ -231,8 +234,6 @@ buster.testCase("buster-configuration group", {
 
 function assertContainsFooAndBar(group, done, extrasCallback) {
     group.resolve().then(function () {
-        if (extrasCallback) extrasCallback();
-
         assert("/foo.js" in group.resourceSet.resources);
         assert("/bar.js" in group.resourceSet.resources);
 
@@ -242,7 +243,11 @@ function assertContainsFooAndBar(group, done, extrasCallback) {
             group.resourceSet.getResource("/bar.js", function (err, resource) {
                 assert.isUndefined(err);
                 assert.equals(resource.content, "var helloFromBar = 1;");
-                done();
+                if (extrasCallback) {
+                    extrasCallback(done);
+                } else {
+                    done();
+                }
             });
         });
     });
