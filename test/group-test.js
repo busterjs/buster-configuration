@@ -194,6 +194,18 @@ buster.testCase("buster-configuration group", {
         assertContainsFooAndBar(group, done, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
         });
+    },
+
+    "should add load files via glob pattern": function (done) {
+        var group = bcGroup.create({
+            load: [
+                "*.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, done, function () {
+            assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
+        });
     }
 });
 
