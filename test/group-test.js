@@ -206,6 +206,24 @@ buster.testCase("buster-configuration group", {
         assertContainsFooAndBar(group, done, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
         });
+    },
+
+    "should load sources libs and tests in right order with globbing": function (done) {
+        var group = bcGroup.create({
+            sources: [
+                "fo*.js"
+            ],
+            libs: [
+                "b*r.js"
+            ],
+            tests: [
+                "test/*.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, done, function () {
+            // TODO: test that tests/my-testish.js is present.
+        });
     }
 });
 
