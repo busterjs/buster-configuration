@@ -231,6 +231,29 @@ buster.testCase("buster-configuration group", {
                 done();
             });
         });
+    },
+
+    "should load sources deps and specs in right order": function (done) {
+        var group = bcGroup.create({
+            sources: [
+                "fo*.js"
+            ],
+            deps: [
+                "b*r.js"
+            ],
+            specs: [
+                "test/*.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, done, function (done) {
+            assert("/test/my-testish.js" in group.resourceSet.resources);
+            group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "{};");
+                done();
+            });
+        });
     }
 });
 
