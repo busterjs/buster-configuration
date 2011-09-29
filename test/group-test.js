@@ -164,5 +164,37 @@ buster.testCase("buster-configuration group", {
             assert.equals(resource.combine.sort(), ["/foo.js", "/bar.js"].sort());
             done();
         });
+    },
+
+    "should add resources with content for file that does not exist": function (done) {
+        var group = bcGroup.create({
+            resources: [
+                {path:"/does-not-exist.txt", content:"Hello, World"}
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            group.resourceSet.getResource("/does-not-exist.txt", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "Hello, World");
+                done();
+            });
+        });
+    },
+
+    "should add resources with content for file that exists": function (done) {
+        var group = bcGroup.create({
+            resources: [
+                {path:"/foo.js", content:"Hello, World"}
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            group.resourceSet.getResource("/foo.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "Hello, World");
+                done();
+            });
+        });
     }
 });
