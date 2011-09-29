@@ -224,8 +224,12 @@ buster.testCase("buster-configuration group", {
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, done, function (done) {
-            // TODO: test that tests/my-testish.js is present.
-            done();
+            assert("/test/my-testish.js" in group.resourceSet.resources);
+            group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "{};");
+                done();
+            });
         });
     }
 });
