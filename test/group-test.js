@@ -196,5 +196,31 @@ buster.testCase("buster-configuration group", {
                 done();
             });
         });
+    },
+
+    "should add load files to load and add them as fle resources": function (done) {
+        var group = bcGroup.create({
+            load: [
+                "foo.js",
+                "bar.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
+
+            assert("/foo.js" in group.resourceSet.resources);
+            assert("/bar.js" in group.resourceSet.resources);
+
+            group.resourceSet.getResource("/foo.js", function (err, resource) {
+                assert.isUndefined(err);
+                assert.equals(resource.content, "var thisIsTheFoo = 5;");
+                group.resourceSet.getResource("/bar.js", function (err, resource) {
+                    assert.isUndefined(err);
+                    assert.equals(resource.content, "var helloFromBar = 1;");
+                    done();
+                });
+            });
+        });
     }
 });
