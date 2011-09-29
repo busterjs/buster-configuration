@@ -224,6 +224,8 @@ buster.testCase("buster-configuration group", {
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, done, function (done) {
+            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
+
             assert("/test/my-testish.js" in group.resourceSet.resources);
             group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
                 assert.isUndefined(err);
@@ -247,6 +249,8 @@ buster.testCase("buster-configuration group", {
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, done, function (done) {
+            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
+            
             assert("/test/my-testish.js" in group.resourceSet.resources);
             group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
                 assert.isUndefined(err);
