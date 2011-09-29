@@ -258,6 +258,30 @@ buster.testCase("buster-configuration group", {
                 done();
             });
         });
+    },
+
+    "should parse server address": function () {
+        var group = bcGroup.create({
+            server: "http://localhost:1234/buster"
+        }, __dirname + "/fixtures");
+
+        assert.match(group.server, {
+            hostname: "localhost",
+            port: 1234,
+            pathname: "/buster"
+        });
+    },
+
+    "should parse server address without path": function () {
+        var group = bcGroup.create({
+            server: "http://localhost:1234"
+        }, __dirname + "/fixtures");
+
+        assert.match(group.server, {
+            hostname: "localhost",
+            port: 1234,
+            pathname: "/"
+        });
     }
 });
 
