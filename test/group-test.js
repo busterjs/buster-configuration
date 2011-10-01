@@ -297,7 +297,30 @@ buster.testCase("buster-configuration group", {
             assert.equals(group.absoluteLoadEntries, expected);
             done();
         });
-    }
+    },
+
+    "should set environment": function () {
+        var group = bcGroup.create({
+            environment: "node"
+        }, __dirname + "/fixtures");
+
+        assert.equals(group.environment, "node");
+    },
+
+    "should default environment to browser": function () {
+        var group = bcGroup.create({
+        }, __dirname + "/fixtures");
+
+        assert.equals(group.environment, "browser");
+    },
+
+    "should set environment via env shorthand": function () {
+        var group = bcGroup.create({
+            env: "node"
+        }, __dirname + "/fixtures");
+
+        assert.equals(group.environment, "node");
+    },
 });
 
 
