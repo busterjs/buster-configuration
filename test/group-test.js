@@ -282,6 +282,21 @@ buster.testCase("buster-configuration group", {
             port: 1234,
             pathname: "/"
         });
+    },
+
+    "should provide list of all items in load with absolute pahts": function (done) {
+        var group = bcGroup.create({
+            load: [
+                "foo.js",
+                "bar.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            var expected = [__dirname + "/fixtures/foo.js", __dirname + "/fixtures/bar.js"];
+            assert.equals(group.absoluteLoadEntries, expected);
+            done();
+        });
     }
 });
 
