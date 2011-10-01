@@ -1,5 +1,6 @@
 var buster = require("buster");
 var assert = buster.assert;
+var refute = buster.refute;
 var busterConfiguration = require("../lib/buster-configuration");
 
 buster.testCase("buster-configuration", {
@@ -53,5 +54,29 @@ buster.testCase("buster-configuration", {
         this.c.filterGroup(/test/);
         assert.equals(this.c.groups.length, 2);
         assert.match(this.c.groups, [{name: "The test"}, {name: "test the foo"}]);
+    },
+
+    "should resolve all groups": function (done) {
+        this.c.addGroup("My group 1", {load: ["test/fixtures/foo.js"]});
+        this.c.addGroup("My group 2", {load: ["test/fixtures/bar.js"]});
+
+        this.c.resolveGroups(function (err) {
+            assert.isUndefined(err);
+            // If it is resolved, it has a resourceSet.
+            assert("resourceSet" in this.c.groups[0]);
+            assert("resourceSet" in this.c.groups[1]);
+            done();
+        }.bind(this));
+    },
+
+    "should resolve all groups with error": function (done) {
+        this.c.addGroup("My group 1", {load: ["test/fixtures/foo.js"]});
+        this.c.addGroup("My group 2", {load: ["test/fixtures/does-not-exist.js"]});
+
+        this.c.resolveGroups(function (err) {
+            refute.isUndefined(err);
+            assert.match(err, "ENOENT");
+            done();
+        }.bind(this));
     }
 });
