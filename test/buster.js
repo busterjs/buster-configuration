@@ -2,5 +2,8 @@ var config = module.exports;
 
 config["Tests"] = {
     environment: "node",
-    tests: []
+    load: [
+        "lib/*.js",
+        "test/*-test.js"
+    ]
 };
