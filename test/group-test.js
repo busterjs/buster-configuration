@@ -321,6 +321,19 @@ buster.testCase("buster-configuration group", {
 
         assert.equals(group.environment, "node");
     },
+
+    "shold support duplicate items in 'load'": function (done) {
+        // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
+        var group = bcGroup.create({
+            load: [
+                "foo.js",
+                "foo.js",
+                "*.js",
+            ]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, done);
+    }
 });
 
 
