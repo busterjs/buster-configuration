@@ -1,6 +1,6 @@
 {
     "name": "buster-configuration",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Implements the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
@@ -19,10 +19,11 @@
         "url": "git://gitorious.org/buster/buster-configuration.git"
     },
     "dependencies": {
-        "buster-core": "~0.3",
+        "buster-core": "~0.4",
         "buster-promise": "~0.3",
         "glob": "~2.0",
-        "buster-module-loader": "~0.2"
+        "buster-module-loader": "~0.2",
+        "buster-resources": "~0.1"
     },
     "devDependencies": {
         "buster": "~0.2.0",
