@@ -333,6 +333,30 @@ buster.testCase("buster-configuration group", {
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, done);
+    },
+
+    "should add bundle groups for framework resources": function (done) {
+        var group = bcGroup.create({
+            load: [
+                "foo.js"
+            ]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            group.setupFrameworkResources();
+
+            var bundleResourceName = "/buster/bundle-" + group.VERSION + ".js";
+            var bundleResource = group.resourceSet.resources[bundleResourceName];
+            refute.isUndefined(bundleResource);
+
+            var compatResourceName = "/buster/compat-" + group.VERSION + ".js";
+            var compatResource = group.resourceSet.resources[compatResourceName];
+            refute.isUndefined(compatResource);
+
+            assert.equals([bundleResourceName, compatResourceName], group.resourceSet.load.slice(0, 2));
+
+            done();
+        });
     }
 });
 
