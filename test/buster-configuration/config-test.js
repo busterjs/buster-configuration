@@ -311,7 +311,7 @@ buster.testCase("buster-configuration config", {
                 load: ["src/2.js", "src/*.js"]
             }).configure().then(function (conf) {
                 assert.equals(conf.load, ["src/2.js", "src/1.js"]);
-                assert.isUndefined(conf.sessionConfig);
+                refute.defined(conf.sessionConfig);
                 done();
             });
         },

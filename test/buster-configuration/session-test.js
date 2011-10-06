@@ -108,8 +108,8 @@ buster.testCase("buster-configuration session", {
         "should set resource path from path argument": function () {
             this.session.addResource("/path", { content: "", path: "/" });
 
-            refute.isUndefined(this.session.resources["/path"]);
-            assert.isUndefined(this.session.resources["/"]);
+            assert.defined(this.session.resources["/path"]);
+            refute.defined(this.session.resources["/"]);
         },
 
         "should add resource with custom headers": function () {
@@ -125,7 +125,7 @@ buster.testCase("buster-configuration session", {
         "should ignore unrecognized key": function () {
             this.session.addResource("/path", { content: "", bogus: "Remove it!" });
 
-            assert.isUndefined(this.session.resources["/path"].bogus);
+            refute.defined(this.session.resources["/path"].bogus);
         },
 
         "should add several resources": function () {
@@ -172,7 +172,7 @@ buster.testCase("buster-configuration session", {
             this.session.addResource("script3.js", { combine: ["script1.js", "script2.js"] });
 
             var resource = this.session.getResource("script3.js");
-            assert.isUndefined(resource.content);
+            refute.defined(resource.content);
             assert.equals(resource.combine, ["script1.js", "script2.js"]);
         },
 
@@ -242,14 +242,14 @@ buster.testCase("buster-configuration session", {
                 backend: "http://localhost"
             });
 
-            assert.isUndefined(this.session.getResource("script1.js").etag);
+            refute.defined(this.session.getResource("script1.js").etag);
         },
 
         "should not add etag to combined resource": function () {
             this.session.addResource("script1.js", { content: "" });
             this.session.addResource("script2.js", { combine: ["script1.js"] });
 
-            assert.isUndefined(this.session.getResource("script2.js").etag);
+            refute.defined(this.session.getResource("script2.js").etag);
         },
 
         "should add uncacheable resource": function () {
@@ -282,7 +282,7 @@ buster.testCase("buster-configuration session", {
                 });
 
                 this.session.configure().then(function (conf) {
-                    assert.isUndefined(conf.resources["/script1.coffee"]);
+                    refute.defined(conf.resources["/script1.coffee"]);
 
                     assert.match(conf.resources, {
                         "/script1.js": {
@@ -306,7 +306,7 @@ buster.testCase("buster-configuration session", {
                 });
 
                 this.session.configure().then(function (conf) {
-                    assert.isUndefined(conf.resources["/script1.coffee"]);
+                    refute.defined(conf.resources["/script1.coffee"]);
                     assert.match(conf.resources, { "/1.js": { content: "Yay" } });
                 });
             },
@@ -327,7 +327,7 @@ buster.testCase("buster-configuration session", {
                 });
 
                 this.session.configure().then(function (conf) {
-                    assert.isUndefined(conf.resources["/2.js"]);
+                    refute.defined(conf.resources["/2.js"]);
                     assert.match(conf.resources, { "/1.js": { content: "Yay" } });
                 });
             },
@@ -348,7 +348,7 @@ buster.testCase("buster-configuration session", {
                 });
 
                 this.session.configure().then(function (conf) {
-                    assert.isUndefined(conf.resources["/1.js"]);
+                    refute.defined(conf.resources["/1.js"]);
                     assert.match(conf.resources, { "/2.js": { content: "Yay" } });
                 });
             },
@@ -359,7 +359,7 @@ buster.testCase("buster-configuration session", {
                 this.session.addFileAsResource("/tmp/script.coffee");
 
                 this.session.configure().then(function (conf) {
-                    assert.isUndefined(conf.resources["/tmp/script.coffee"]);
+                    refute.defined(conf.resources["/tmp/script.coffee"]);
                     assert.match(conf.resources, {
                         "/tmp/script.js": { content: "var coffeescript;" }
                     });
@@ -476,7 +476,7 @@ buster.testCase("buster-configuration session", {
 
             "should remove pending indicator of resource": function (done) {
                 this.session.addFileAsResource("/path.js").then(function () {
-                    assert.isUndefined(this.session.resources["/path.js"].pending);
+                    refute.defined(this.session.resources["/path.js"].pending);
                     done();
                 }.bind(this));
             },
@@ -497,8 +497,8 @@ buster.testCase("buster-configuration session", {
                 this.session.addFileAsResource("/path.js", {
                     path: "/javasripts/buster.js"
                 }).then(function () {
-                    refute.isUndefined(this.session.resources["/javasripts/buster.js"]);
-                    assert.isUndefined(this.session.resources["/path.js"]);
+                    assert.defined(this.session.resources["/javasripts/buster.js"]);
+                    refute.defined(this.session.resources["/path.js"]);
 
                     done();
                 }.bind(this));
