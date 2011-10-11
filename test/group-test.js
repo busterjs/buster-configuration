@@ -24,7 +24,7 @@ buster.testCase("buster-configuration group", {
 
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "var thisIsTheFoo = 5;");
                 done();
             });
@@ -63,7 +63,7 @@ buster.testCase("buster-configuration group", {
 
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.match(resource.headers, {"X-Foo": "Bar"});
                 done();
             });
@@ -79,7 +79,7 @@ buster.testCase("buster-configuration group", {
 
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert("etag" in resource);
                 // TODO: Should probably test more here.
                 done();
@@ -160,7 +160,7 @@ buster.testCase("buster-configuration group", {
 
         group.resolve().then(function () {
             group.resourceSet.getResource("/does-not-exist.txt", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "Hello, World");
                 done();
             });
@@ -176,7 +176,7 @@ buster.testCase("buster-configuration group", {
 
         group.resolve().then(function () {
             group.resourceSet.getResource("/foo.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "Hello, World");
                 done();
             });
@@ -228,7 +228,7 @@ buster.testCase("buster-configuration group", {
 
             assert("/test/my-testish.js" in group.resourceSet.resources);
             group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "{};");
                 done();
             });
@@ -253,7 +253,7 @@ buster.testCase("buster-configuration group", {
             
             assert("/test/my-testish.js" in group.resourceSet.resources);
             group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "{};");
                 done();
             });
@@ -347,11 +347,11 @@ buster.testCase("buster-configuration group", {
 
             var bundleResourceName = "/buster/bundle-" + group.VERSION + ".js";
             var bundleResource = group.resourceSet.resources[bundleResourceName];
-            refute.isUndefined(bundleResource);
+            assert.defined(bundleResource);
 
             var compatResourceName = "/buster/compat-" + group.VERSION + ".js";
             var compatResource = group.resourceSet.resources[compatResourceName];
-            refute.isUndefined(compatResource);
+            assert.defined(compatResource);
 
             assert.equals([bundleResourceName, compatResourceName], group.resourceSet.load.slice(0, 2));
 
@@ -368,10 +368,10 @@ function assertContainsFooAndBar(group, done, extrasCallback) {
         assert("/bar.js" in group.resourceSet.resources);
 
         group.resourceSet.getResource("/foo.js", function (err, resource) {
-            assert.isUndefined(err);
+            refute.defined(err);
             assert.equals(resource.content, "var thisIsTheFoo = 5;");
             group.resourceSet.getResource("/bar.js", function (err, resource) {
-                assert.isUndefined(err);
+                refute.defined(err);
                 assert.equals(resource.content, "var helloFromBar = 1;");
                 if (extrasCallback) {
                     extrasCallback(done);
