@@ -250,7 +250,7 @@ buster.testCase("buster-configuration group", {
 
         assertContainsFooAndBar(group, done, function (done) {
             assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
-            
+
             assert("/test/my-testish.js" in group.resourceSet.resources);
             group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
                 refute.defined(err);
@@ -355,6 +355,17 @@ buster.testCase("buster-configuration group", {
 
             assert.equals([bundleResourceName, compatResourceName], group.resourceSet.load.slice(0, 2));
 
+            done();
+        });
+    },
+
+    "should pass itself as the promise resolution": function (done) {
+        var group = bcGroup.create({
+            load: ["foo.js"]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function (gr) {
+            assert.same(gr, group);
             done();
         });
     }
