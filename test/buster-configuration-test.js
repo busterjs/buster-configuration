@@ -18,7 +18,7 @@ buster.testCase("buster-configuration", {
     },
 
     "should load groups from config file": function () {
-        assert.isTrue(this.c.loadGroupsFromConfigFile(__dirname + "/buster", process.cwd()));
+        assert.isTrue(this.c.loadGroupsFromConfigFile(__dirname + "/buster"));
         assert.equals(this.c.groups.length, 1);
     },
 
