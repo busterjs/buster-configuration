@@ -327,7 +327,7 @@ buster.testCase("buster-configuration group", {
             autoRun: true
         }, __dirname + "/fixtures");
 
-        assert.equals(group.autoRun, true);
+        assert.equals(group.options.autoRun, true);
     },
 
     "should support duplicate items in 'load'": function (done) {
