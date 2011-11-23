@@ -6,10 +6,11 @@ var busterConfiguration = require("../lib/buster-configuration");
 buster.testCase("buster-configuration", {
     setUp: function () {
         this.c = busterConfiguration.create();
+        this.rootPath = __dirname;
     },
 
     "should add groups": function () {
-        this.c.addGroup("My group", {});
+        this.c.addGroup("My group", {}, this.rootPath);
 
         assert.equals(this.c.groups.length, 1);
         var group = this.c.groups[0];
@@ -27,17 +28,17 @@ buster.testCase("buster-configuration", {
     },
 
     "should filter groups on environment": function () {
-        this.c.addGroup("My group 1", {environment: "node"});
-        this.c.addGroup("My group 2", {environment: "node"});
-        this.c.addGroup("My group 3", {environment: "browser"});
+        this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
+        this.c.addGroup("My group 2", {environment: "node"}, this.rootPath);
+        this.c.addGroup("My group 3", {environment: "browser"}, this.rootPath);
 
         this.c.filterEnv("node");
         assert.equals(this.c.groups.length, 2);
     },
 
     "should handle none-string for env filtering": function () {
-        this.c.addGroup("My group 1", {environment: "node"});
-        this.c.addGroup("My group 2", {environment: "browser"});
+        this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
+        this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
 
         this.c.filterEnv(null);
         this.c.filterEnv({});
@@ -47,9 +48,9 @@ buster.testCase("buster-configuration", {
     },
 
     "should filter groups on name": function () {
-        this.c.addGroup("The test", {});
-        this.c.addGroup("test the foo", {});
-        this.c.addGroup("foo the bar", {});
+        this.c.addGroup("The test", {}, this.rootPath);
+        this.c.addGroup("test the foo", {}, this.rootPath);
+        this.c.addGroup("foo the bar", {}, this.rootPath);
 
         this.c.filterGroup(/test/);
         assert.equals(this.c.groups.length, 2);
@@ -57,8 +58,8 @@ buster.testCase("buster-configuration", {
     },
 
     "should resolve all groups": function (done) {
-        this.c.addGroup("My group 1", {load: ["test/fixtures/foo.js"]});
-        this.c.addGroup("My group 2", {load: ["test/fixtures/bar.js"]});
+        this.c.addGroup("My group 1", {load: ["fixtures/foo.js"]}, this.rootPath);
+        this.c.addGroup("My group 2", {load: ["fixtures/bar.js"]}, this.rootPath);
 
         this.c.resolveGroups(function (err) {
             refute.defined(err);
@@ -70,8 +71,8 @@ buster.testCase("buster-configuration", {
     },
 
     "should resolve all groups with error": function (done) {
-        this.c.addGroup("My group 1", {load: ["test/fixtures/foo.js"]});
-        this.c.addGroup("My group 2", {load: ["test/fixtures/does-not-exist.js"]});
+        this.c.addGroup("My group 1", {load: ["fixtures/foo.js"]}, this.rootPath);
+        this.c.addGroup("My group 2", {load: ["fixtures/does-not-exist.js"]}, this.rootPath);
 
         this.c.resolveGroups(function (err) {
             assert.defined(err);
