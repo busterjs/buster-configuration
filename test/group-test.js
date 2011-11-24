@@ -322,7 +322,15 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.environment, "node");
     },
 
-    "shold support duplicate items in 'load'": function (done) {
+    "should set autoRun option": function () {
+        var group = bcGroup.create({
+            autoRun: true
+        }, __dirname + "/fixtures");
+
+        assert.equals(group.options.autoRun, true);
+    },
+
+    "should support duplicate items in 'load'": function (done) {
         // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
         var group = bcGroup.create({
             load: [
