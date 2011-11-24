@@ -21,7 +21,7 @@
     "dependencies": {
         "buster-core": "~0.4",
         "buster-promise": "~0.3",
-        "glob": "~2.0",
+        "glob": "~2.1",
         "buster-module-loader": "~0.2",
         "buster-resources": "~0.1",
         "buster-evented-logger": "~0.3",
