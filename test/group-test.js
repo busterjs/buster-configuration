@@ -183,12 +183,9 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add load files to load and add them as file resources": function (done) {
+    "should add source files to load and add them as file resources": function (done) {
         var group = bcGroup.create({
-            load: [
-                "foo.js",
-                "bar.js"
-            ]
+            sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, function () {
@@ -197,30 +194,33 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add load files via glob pattern": function (done) {
+    "should add source files via glob pattern": function (done) {
         var group = bcGroup.create({
-            load: [
-                "*.js"
-            ]
+            sources: ["*.js"]
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
+            done();
+        });
+    },
+
+    "should ignore anything in load": function (done) {
+        var group = bcGroup.create({
+            load: ["*.js"]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            assert.equals(group.resourceSet.load, []);
             done();
         });
     },
 
     "should load sources libs and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
-            sources: [
-                "fo*.js"
-            ],
-            libs: [
-                "b*r.js"
-            ],
-            tests: [
-                "test/*.js"
-            ]
+            sources: ["fo*.js"],
+            libs: ["b*r.js"],
+            tests: ["test/*.js"]
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, function () {
@@ -237,15 +237,9 @@ buster.testCase("buster-configuration group", {
 
     "should load sources deps and specs in right order": function (done) {
         var group = bcGroup.create({
-            sources: [
-                "fo*.js"
-            ],
-            deps: [
-                "b*r.js"
-            ],
-            specs: [
-                "test/*.js"
-            ]
+            sources: ["fo*.js"],
+            deps: ["b*r.js"],
+            specs: ["test/*.js"]
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, function () {
@@ -286,10 +280,7 @@ buster.testCase("buster-configuration group", {
 
     "should provide list of all items in load with absolute pahts": function (done) {
         var group = bcGroup.create({
-            load: [
-                "foo.js",
-                "bar.js"
-            ]
+            libs: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
         group.resolve().then(function () {
@@ -330,25 +321,17 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.options.autoRun, true);
     },
 
-    "should support duplicate items in 'load'": function (done) {
+    "should support duplicate items in sources": function (done) {
         // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
         var group = bcGroup.create({
-            load: [
-                "foo.js",
-                "foo.js",
-                "*.js",
-            ]
+            sources: ["foo.js", "foo.js", "*.js"]
         }, __dirname + "/fixtures");
 
         assertContainsFooAndBar(group, done);
     },
 
     "should add bundle groups for framework resources": function (done) {
-        var group = bcGroup.create({
-            load: [
-                "foo.js"
-            ]
-        }, __dirname + "/fixtures");
+        var group = bcGroup.create({}, __dirname + "/fixtures");
 
         group.resolve().then(function () {
             group.setupFrameworkResources();
@@ -369,7 +352,7 @@ buster.testCase("buster-configuration group", {
 
     "should pass itself as the promise resolution": function (done) {
         var group = bcGroup.create({
-            load: ["foo.js"]
+            libs: ["foo.js"]
         }, __dirname + "/fixtures");
 
         group.resolve().then(function (gr) {

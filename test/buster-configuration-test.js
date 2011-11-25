@@ -58,8 +58,8 @@ buster.testCase("buster-configuration", {
     },
 
     "should resolve all groups": function (done) {
-        this.c.addGroup("My group 1", {load: ["fixtures/foo.js"]}, this.rootPath);
-        this.c.addGroup("My group 2", {load: ["fixtures/bar.js"]}, this.rootPath);
+        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
+        this.c.addGroup("My group 2", {sources: ["fixtures/bar.js"]}, this.rootPath);
 
         this.c.resolveGroups(function (err) {
             refute.defined(err);
@@ -71,8 +71,8 @@ buster.testCase("buster-configuration", {
     },
 
     "should resolve all groups with error": function (done) {
-        this.c.addGroup("My group 1", {load: ["fixtures/foo.js"]}, this.rootPath);
-        this.c.addGroup("My group 2", {load: ["fixtures/does-not-exist.js"]}, this.rootPath);
+        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
+        this.c.addGroup("My group 2", {sources: ["fixtures/does-not-exist.js"]}, this.rootPath);
 
         this.c.resolveGroups(function (err) {
             assert.defined(err);
@@ -83,7 +83,7 @@ buster.testCase("buster-configuration", {
 
     "should resolve group with custom root path": function (done) {
         this.c.addGroup("My group 1", {
-            load: ["test/fixtures/foo.js"],
+            sources: ["test/fixtures/foo.js"],
             rootPath: __dirname + "/.."
         });
 
