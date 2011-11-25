@@ -216,10 +216,10 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load sources libs and tests in right order with globbing": function (done) {
+    "should load libs, sources and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
-            sources: ["fo*.js"],
-            libs: ["b*r.js"],
+            libs: ["fo*.js"],
+            sources: ["b*r.js"],
             tests: ["test/*.js"]
         }, __dirname + "/fixtures");
 
@@ -235,10 +235,10 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load sources deps and specs in right order": function (done) {
+    "should load deps, sources and specs in right order": function (done) {
         var group = bcGroup.create({
-            sources: ["fo*.js"],
-            deps: ["b*r.js"],
+            deps: ["fo*.js"],
+            sources: ["b*r.js"],
             specs: ["test/*.js"]
         }, __dirname + "/fixtures");
 
@@ -251,6 +251,20 @@ buster.testCase("buster-configuration group", {
                 assert.equals(resource.content, "{};");
                 done();
             });
+        });
+    },
+
+    "should load lib, deps and sources right order": function (done) {
+        var group = bcGroup.create({
+            deps: ["fo*.js"],
+            libs: ["b*r.js"],
+            sources: ["test/*.js"]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, function () {
+            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"],
+                          group.resourceSet.load);
+            done();
         });
     },
 
@@ -365,7 +379,6 @@ buster.testCase("buster-configuration group", {
             assert.same(gr, group);
             done();
         });
-    }
     },
 
     "should not resolve multiple times": function (done) {
