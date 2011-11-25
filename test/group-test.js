@@ -217,17 +217,6 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should ignore anything in load": function (done) {
-        var group = bcGroup.create({
-            load: ["*.js"]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            assert.equals(group.resourceSet.load, []);
-            done();
-        });
-    },
-
     "should load libs, sources and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
             libs: ["fo*.js"],
@@ -266,10 +255,24 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load lib, deps and sources right order": function (done) {
+    "should load lib, deps and sources in right order": function (done) {
         var group = bcGroup.create({
             deps: ["fo*.js"],
             libs: ["b*r.js"],
+            sources: ["test/*.js"]
+        }, __dirname + "/fixtures");
+
+        assertContainsFooAndBar(group, function () {
+            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"],
+                          group.resourceSet.load);
+            done();
+        });
+    },
+
+    "should load libs, src and sources in right order": function (done) {
+        var group = bcGroup.create({
+            libs: ["fo*.js"],
+            src: ["b*r.js"],
             sources: ["test/*.js"]
         }, __dirname + "/fixtures");
 
@@ -304,7 +307,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should provide list of all items in load with absolute pahts": function (done) {
+    "should provide list of all items in load with absolute paths": function (done) {
         var group = bcGroup.create({
             libs: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
