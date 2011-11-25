@@ -360,6 +360,21 @@ buster.testCase("buster-configuration group", {
             done();
         });
     }
+    },
+
+    "should not resolve multiple times": function (done) {
+        var group = bcGroup.create({
+            libs: ["foo.js"]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+            var resourceSet = group.resourceSet;
+            group.resolve().then(function () {
+                assert.same(group.resourceSet, resourceSet);
+                done();
+            });
+        });
+    },
 });
 
 function assertContainsFooAndBar(group, done) {
