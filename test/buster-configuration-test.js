@@ -36,7 +36,7 @@ buster.testCase("buster-configuration", {
         assert.equals(this.c.groups.length, 2);
     },
 
-    "should handle none-string for env filtering": function () {
+    "should handle non-string for env filtering": function () {
         this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
         this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
 
