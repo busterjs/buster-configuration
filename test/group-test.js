@@ -191,7 +191,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function (done) {
+        assertContainsFooAndBar(group, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
             done();
         });
@@ -204,7 +204,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function (done) {
+        assertContainsFooAndBar(group, function () {
             assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
             done();
         });
@@ -223,7 +223,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function (done) {
+        assertContainsFooAndBar(group, function () {
             assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
 
             assert("/test/my-testish.js" in group.resourceSet.resources);
@@ -248,7 +248,7 @@ buster.testCase("buster-configuration group", {
             ]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done, function (done) {
+        assertContainsFooAndBar(group, function () {
             assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
 
             assert("/test/my-testish.js" in group.resourceSet.resources);
@@ -379,9 +379,7 @@ buster.testCase("buster-configuration group", {
     }
 });
 
-
-
-function assertContainsFooAndBar(group, done, extrasCallback) {
+function assertContainsFooAndBar(group, done) {
     group.resolve().then(function () {
         assert("/foo.js" in group.resourceSet.resources);
         assert("/bar.js" in group.resourceSet.resources);
@@ -392,11 +390,7 @@ function assertContainsFooAndBar(group, done, extrasCallback) {
             group.resourceSet.getResource("/bar.js", function (err, resource) {
                 refute.defined(err);
                 assert.equals(resource.content, "var helloFromBar = 1;");
-                if (extrasCallback) {
-                    extrasCallback(done);
-                } else {
-                    done();
-                }
+                done();
             });
         });
     });
