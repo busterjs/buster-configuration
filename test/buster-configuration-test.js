@@ -122,5 +122,17 @@ buster.testCase("buster-configuration", {
             assert(group.options.autoRun);
             done();
         }.bind(this));
+    },
+
+    "should complain about unknown property": function (done) {
+        this.c.addGroup("My group 1", {
+            load: ["fixtures/foo.js"]
+        }, __dirname);
+
+        this.c.resolveGroups(function (err) {
+            assert.match(err, "Unknown configuration option 'load'");
+            assert.match(err, "Did you mean one of: deps, libs, sources, tests, specs?");
+            done();
+        }.bind(this));
     }
 });

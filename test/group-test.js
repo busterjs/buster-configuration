@@ -31,6 +31,18 @@ buster.testCase("buster-configuration group", {
         });
     },
 
+    "should create group without file system access": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path: "/hey", content: "// OK" }],
+            sources: ["/hey"]
+        });
+
+        group.resolve().then(function () {
+            assert.equals(group.resourceSet.load, ["/hey"]);
+            done();
+        }.bind(this));
+    },
+
     "should resolve globs": function (done) {
         var group = bcGroup.create({
             resources: [
