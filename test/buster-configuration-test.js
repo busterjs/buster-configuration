@@ -92,5 +92,18 @@ buster.testCase("buster-configuration", {
             assert("resourceSet" in this.c.groups[0]);
             done();
         }.bind(this));
+    },
+
+    "should resolve custom root path relative to file root path": function (done) {
+        this.c.addGroup("My group 1", {
+            sources: ["test/fixtures/foo.js"],
+            rootPath: ".."
+        }, __dirname);
+
+        this.c.resolveGroups(function (err) {
+            refute.defined(err);
+            assert("resourceSet" in this.c.groups[0]);
+            done();
+        }.bind(this));
     }
 });
