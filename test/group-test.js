@@ -321,6 +321,12 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.options.autoRun, true);
     },
 
+    "should not default autoRun option": function () {
+        var group = bcGroup.create({}, __dirname + "/fixtures");
+
+        refute("autoRun" in group.options);
+    },
+
     "should support duplicate items in sources": function (done) {
         // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
         var group = bcGroup.create({
