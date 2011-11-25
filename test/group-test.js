@@ -183,7 +183,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add load files to load and add them as fle resources": function (done) {
+    "should add load files to load and add them as file resources": function (done) {
         var group = bcGroup.create({
             load: [
                 "foo.js",
