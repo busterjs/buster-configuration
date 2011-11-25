@@ -394,6 +394,104 @@ buster.testCase("buster-configuration group", {
             });
         });
     },
+
+    "extended configuration": {
+        setUp: function () {
+            this.group = bcGroup.create({
+                libs: ["foo.js"],
+                server: "localhost:9191",
+                autoRun: true
+            }, __dirname + "/fixtures");
+        },
+
+        "inherits libs from parent group": function (done) {
+            var group = this.group.extend();
+
+            group.resolve().then(function () {
+                assert("/foo.js" in group.resourceSet.resources);
+                done();
+            });
+        },
+
+        "does not modify parent group resources": function (done) {
+            var group = this.group.extend({
+                sources: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            this.group.resolve().then(function (parent) {
+                group.resolve().then(function () {
+                    assert("/bar.js" in group.resourceSet.resources);
+                    refute("/bar.js" in parent.resourceSet.resources);
+                    done();
+                });
+            });
+        },
+
+        "mixes load from both groups": function (done) {
+            var group = this.group.extend({
+                sources: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {
+                assert.equals(group.resourceSet.load, ["/foo.js", "/bar.js"]);
+                done();
+            });
+        },
+
+        "does not modify parent group load": function (done) {
+            var group = this.group.extend({
+                tests: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            this.group.resolve().then(function (parent) {
+                group.resolve().then(function () {
+                    assert.equals(parent.resourceSet.load, ["/foo.js"]);
+                    done();
+                });
+            });
+        },
+
+        "uses libs from both in correct order": function (done) {
+            var group = this.group.extend({
+                libs: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {
+                assert.equals(group.resourceSet.load, ["/foo.js", "/bar.js"]);
+                done();
+            });
+        },
+
+        "inherits server setting": function () {
+            var group = this.group.extend({ libs: [] });
+            assert.match(group.server, { hostname: "localhost", port: 9191 });
+        },
+
+        "overrides server setting": function () {
+            var group = this.group.extend({ server: "localhost:7878" });
+            assert.match(group.server, { port: 7878 });
+        },
+
+        "inherits environment": function () {
+            var group = this.group.extend({ libs: [] });
+            assert.equals(group.environment, "browser");
+        },
+
+        "overrides environment": function () {
+            var group = this.group.extend({ environment: "node", libs: [] });
+            assert.equals(group.environment, "node");
+        },
+
+        "inherits autoRun option": function () {
+            var group = this.group.extend({ libs: [] });
+            assert(group.options.autoRun);
+        },
+
+        "overrides autoRun option": function () {
+            var group = this.group.extend({ autoRun: false, libs: [] });
+            refute(group.options.autoRun);
+        }
+    }
 });
 
 function assertContainsFooAndBar(group, done) {
