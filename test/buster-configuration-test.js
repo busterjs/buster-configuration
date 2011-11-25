@@ -105,5 +105,22 @@ buster.testCase("buster-configuration", {
             assert("resourceSet" in this.c.groups[0]);
             done();
         }.bind(this));
+    },
+
+    "should create extended group": function (done) {
+        this.c.addGroup("My group 1", {
+            sources: ["fixtures/foo.js"]
+        }, __dirname);
+
+        var group = this.c.addGroup("My group 2", {
+            extends: "My group 1",
+            autoRun: true
+        });
+
+        this.c.resolveGroups(function (err) {
+            assert.equals(group.resourceSet.load, ["/fixtures/foo.js"]);
+            assert(group.options.autoRun);
+            done();
+        }.bind(this));
     }
 });
