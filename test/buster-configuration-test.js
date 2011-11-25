@@ -18,12 +18,12 @@ buster.testCase("buster-configuration", {
     },
 
     "should load groups from config file": function () {
-        assert.isTrue(this.c.loadGroupsFromConfigFile(__dirname + "/buster"));
+        assert(this.c.loadGroupsFromConfigFile(__dirname + "/buster"));
         assert.equals(this.c.groups.length, 1);
     },
 
     "should handle none existing file": function () {
-        assert.isFalse(this.c.loadGroupsFromConfigFile(__dirname + "/does-not-exist"));
+        refute(this.c.loadGroupsFromConfigFile(__dirname + "/does-not-exist"));
         assert.equals(this.c.groups.length, 0);
     },
 
