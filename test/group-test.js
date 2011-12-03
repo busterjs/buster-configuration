@@ -2,6 +2,7 @@ var buster = require("buster");
 var assert = buster.assert;
 var refute = buster.refute;
 var bcGroup = require("../lib/group");
+var moduleLoader = require("buster-module-loader");
 
 buster.testCase("configuration group", {
     "creates resources with root path": function (done) {
@@ -584,6 +585,78 @@ buster.testCase("configuration group", {
         "overrides autoRun option": function () {
             var group = this.group.extend({ autoRun: false, libs: [] });
             refute(group.options.autoRun);
+        }
+    },
+
+    "extensions": {
+        setUp: function () {
+            this.configure = this.spy();
+            this.stub(moduleLoader, "load").returns({ configure: this.configure });
+        },
+
+        "loads modules with buster-module-loader": function (done) {
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {
+                assert.calledOnceWith(moduleLoader.load, "baluba");
+                done();
+            });
+        },
+
+        "loads all extensions": function (done) {
+            var group = bcGroup.create({
+                extensions: ["baluba", "swan"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {
+                assert.calledWith(moduleLoader.load, "baluba");
+                assert.calledWith(moduleLoader.load, "swan");
+                done();
+            });
+        },
+
+        "calls configure on extensions": function (done) {
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {
+                assert.calledOnceWith(this.configure, group);
+                done();
+            }.bind(this));
+        },
+
+        "fails gracefully if extension cannot be found": function (done) {
+            moduleLoader.load.throws({
+                name: "Error",
+                message: "Cannot find module 'baluba'"
+            });
+
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {}, function (e) {
+                assert.match(e.message, "Failed loading extensions");
+                assert.match(e.message, "Cannot find module 'baluba'");
+                done();
+            }.bind(this));
+        },
+
+        "fails gracefully if extension has no configure method": function (done) {
+            moduleLoader.load.returns({});
+
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {}, function (e) {
+                assert.match(e.message, "Failed loading extensions");
+                assert.match(e.message, "Extension 'baluba' has no 'configure' method");
+                done();
+            }.bind(this));
         }
     }
 });
