@@ -134,5 +134,55 @@ buster.testCase("buster-configuration", {
             assert.match(err, "Did you mean one of: deps, libs, sources, tests, specs?");
             done();
         }.bind(this));
+    },
+
+    "load events": {
+        "delegates to groups": function () {
+            this.c.groups = [buster.eventEmitter.create(),
+                             buster.eventEmitter.create()];
+
+            var listener = this.spy();
+            this.c.on("load:sources", listener);
+            this.c.groups[0].emit("load:sources", 42);
+            this.c.groups[1].emit("load:sources", 43);
+
+            assert.calledWith(listener, 42);
+            assert.calledWith(listener, 43);
+        },
+
+        "delegates to groups added after listen": function () {
+            var listener = this.spy();
+            this.c.on("load:sources", listener);
+
+            this.c.addGroup("Some group", {});
+            this.c.groups[0].emit("load:sources", 42);
+
+            assert.calledOnceWith(listener, 42);
+        }
+    },
+
+    "framework events": {
+        "delegates to groups": function () {
+            this.c.groups = [buster.eventEmitter.create(),
+                             buster.eventEmitter.create()];
+
+            var listener = this.spy();
+            this.c.on("load:resources", listener);
+            this.c.groups[0].emit("load:resources", 42);
+            this.c.groups[1].emit("load:resources", 43);
+
+            assert.calledWith(listener, 42);
+            assert.calledWith(listener, 43);
+        },
+
+        "delegates to groups added after listen": function () {
+            var listener = this.spy();
+            this.c.on("load:resources", listener);
+
+            this.c.addGroup("Some group", {});
+            this.c.groups[0].emit("load:resources", 42);
+
+            assert.calledOnceWith(listener, 42);
+        }
     }
 });
