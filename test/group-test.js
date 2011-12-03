@@ -365,24 +365,41 @@ buster.testCase("configuration group", {
         assertContainsFooAndBar(group, done);
     },
 
-    "adds bundle groups for framework resources": function (done) {
-        var group = bcGroup.create({}, __dirname + "/fixtures");
+    "framework resources": {
+        setUp: function (done) {
+            this.group = bcGroup.create({}, __dirname + "/fixtures");
+            this.group.resolve().then(function () {
+                this.resourceSet = this.group.resourceSet;
+                done();
+            }.bind(this));
+        },
 
-        group.resolve().then(function () {
-            group.setupFrameworkResources();
+        "adds bundle groups": function () {
+            this.group.setupFrameworkResources();
 
             var bundleResourceName = "/buster/bundle-0.2.0.js";
-            var bundleResource = group.resourceSet.resources[bundleResourceName];
+            var bundleResource = this.resourceSet.resources[bundleResourceName];
             assert.defined(bundleResource);
 
             var compatResourceName = "/buster/compat-0.2.0.js";
-            var compatResource = group.resourceSet.resources[compatResourceName];
+            var compatResource = this.resourceSet.resources[compatResourceName];
             assert.defined(compatResource);
 
-            assert.equals([bundleResourceName, compatResourceName], group.resourceSet.load.slice(0, 2));
+            assert.equals([bundleResourceName, compatResourceName],
+                          this.resourceSet.load.slice(0, 2));
+        },
 
-            done();
-        });
+        "allows extension with events": function () {
+            this.group.on("load:resources", function (resourceSet) {
+                resourceSet.addResource("/stuff", {
+                    content: "Oh yeah!"
+                });
+            });
+            this.group.setupFrameworkResources();
+
+            assert.defined(this.resourceSet.resources["/stuff"]);
+            assert.equals(this.resourceSet.resources["/stuff"].content, "Oh yeah!");
+        }
     },
 
     "passes itself as the promise resolution": function (done) {
