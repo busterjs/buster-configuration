@@ -131,7 +131,7 @@ buster.testCase("buster-configuration", {
 
         this.c.resolveGroups(function (err) {
             assert.match(err, "Unknown configuration option 'load'");
-            assert.match(err, "Did you mean one of: deps, libs, sources, tests, specs?");
+            assert.match(err, "Did you mean one of: deps, libs, src, sources, tests, specs?");
             done();
         }.bind(this));
     },
