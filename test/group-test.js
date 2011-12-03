@@ -410,6 +410,68 @@ buster.testCase("configuration group", {
         });
     },
 
+    "resource load hooks": {
+        "can override dependencies": function (done) {
+            var group = bcGroup.create({
+                deps: ["foo.js"]
+            }, __dirname + "/fixtures");
+
+            group.on("load:dependencies", function (deps) {
+                deps.push("bar.js");
+            });
+
+            assertContainsFooAndBar(group, done);
+        },
+
+        "fires dependencies only once for libs/deps": function (done) {
+            var group = bcGroup.create({
+                deps: ["foo.js"], libs: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            group.on("load:dependencies", function (deps) {
+                deps.shift();
+                deps.shift();
+            });
+
+            group.resolve().then(function () {
+                assert.equals(group.resourceSet.resources, {});
+                done();
+            });
+        },
+
+        "fires sources once for src/sources": function (done) {
+            var group = bcGroup.create({
+                src: ["foo.js"], sources: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            group.on("load:sources", function (deps) {
+                deps.shift();
+                deps.shift();
+            });
+
+            group.resolve().then(function () {
+                assert.equals(group.resourceSet.resources, {});
+                done();
+            });
+        },
+
+        "fires testss once for specs/tests": function (done) {
+            var group = bcGroup.create({
+                tests: ["foo.js"], specs: ["bar.js"]
+            }, __dirname + "/fixtures");
+
+            group.on("load:tests", function (deps) {
+                deps.shift();
+                deps.shift();
+            });
+
+            group.resolve().then(function () {
+                assert.equals(group.resourceSet.resources, {});
+                done();
+            });
+        }
+    },
+
     "extended configuration": {
         setUp: function () {
             this.group = bcGroup.create({
