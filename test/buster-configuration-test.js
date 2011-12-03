@@ -9,7 +9,7 @@ buster.testCase("buster-configuration", {
         this.rootPath = __dirname;
     },
 
-    "should add groups": function () {
+    "adds group": function () {
         this.c.addGroup("My group", {}, this.rootPath);
 
         assert.equals(this.c.groups.length, 1);
@@ -17,17 +17,17 @@ buster.testCase("buster-configuration", {
         assert.equals(group.name, "My group");
     },
 
-    "should load groups from config file": function () {
+    "loads groups from config file": function () {
         assert(this.c.loadGroupsFromConfigFile(__dirname + "/buster"));
         assert.equals(this.c.groups.length, 1);
     },
 
-    "should handle none existing file": function () {
+    "handles non-existing file": function () {
         refute(this.c.loadGroupsFromConfigFile(__dirname + "/does-not-exist"));
         assert.equals(this.c.groups.length, 0);
     },
 
-    "should filter groups on environment": function () {
+    "filters groups on environment": function () {
         this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
         this.c.addGroup("My group 2", {environment: "node"}, this.rootPath);
         this.c.addGroup("My group 3", {environment: "browser"}, this.rootPath);
@@ -36,7 +36,7 @@ buster.testCase("buster-configuration", {
         assert.equals(this.c.groups.length, 2);
     },
 
-    "should handle non-string for env filtering": function () {
+    "ignores non-string environment filters": function () {
         this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
         this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
 
@@ -47,7 +47,7 @@ buster.testCase("buster-configuration", {
         assert.equals(this.c.groups.length, 2);
     },
 
-    "should filter groups on name": function () {
+    "filters groups on name": function () {
         this.c.addGroup("The test", {}, this.rootPath);
         this.c.addGroup("test the foo", {}, this.rootPath);
         this.c.addGroup("foo the bar", {}, this.rootPath);
@@ -57,7 +57,7 @@ buster.testCase("buster-configuration", {
         assert.match(this.c.groups, [{name: "The test"}, {name: "test the foo"}]);
     },
 
-    "should resolve all groups": function (done) {
+    "resolves all groups": function (done) {
         this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
         this.c.addGroup("My group 2", {sources: ["fixtures/bar.js"]}, this.rootPath);
 
@@ -70,7 +70,7 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
-    "should resolve all groups with error": function (done) {
+    "resolves all groups with error": function (done) {
         this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
         this.c.addGroup("My group 2", {sources: ["fixtures/does-not-exist.js"]}, this.rootPath);
 
@@ -81,7 +81,7 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
-    "should resolve group with custom root path": function (done) {
+    "resolves group with custom root path": function (done) {
         this.c.addGroup("My group 1", {
             sources: ["test/fixtures/foo.js"],
             rootPath: __dirname + "/.."
@@ -94,7 +94,7 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
-    "should resolve custom root path relative to file root path": function (done) {
+    "resolves custom root path relative to file root path": function (done) {
         this.c.addGroup("My group 1", {
             sources: ["test/fixtures/foo.js"],
             rootPath: ".."
@@ -107,7 +107,7 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
-    "should create extended group": function (done) {
+    "creates extended group": function (done) {
         this.c.addGroup("My group 1", {
             sources: ["fixtures/foo.js"]
         }, __dirname);
@@ -124,7 +124,7 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
-    "should complain about unknown property": function (done) {
+    "complains about unknown property": function (done) {
         this.c.addGroup("My group 1", {
             load: ["fixtures/foo.js"]
         }, __dirname);

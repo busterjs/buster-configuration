@@ -3,8 +3,8 @@ var assert = buster.assert;
 var refute = buster.refute;
 var bcGroup = require("../lib/group");
 
-buster.testCase("buster-configuration group", {
-    "should create resources with root path": function (done) {
+buster.testCase("configuration group", {
+    "creates resources with root path": function (done) {
         var group = bcGroup.create({
             resources: [
                 "foo.js",
@@ -15,7 +15,7 @@ buster.testCase("buster-configuration group", {
         assertContainsFooAndBar(group, done);
     },
 
-    "should get file contents as actual content": function (done) {
+    "gets file contents as actual content": function (done) {
         var group = bcGroup.create({
             resources: [
                 "foo.js"
@@ -31,7 +31,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should create group without file system access": function (done) {
+    "creates group without file system access": function (done) {
         var group = bcGroup.create({
             resources: [{ path: "/hey", content: "// OK" }],
             sources: ["/hey"]
@@ -43,7 +43,7 @@ buster.testCase("buster-configuration group", {
         }.bind(this));
     },
 
-    "should resolve globs": function (done) {
+    "resolves globs": function (done) {
         var group = bcGroup.create({
             resources: [
                 "*.js"
@@ -53,7 +53,7 @@ buster.testCase("buster-configuration group", {
         assertContainsFooAndBar(group, done);
     },
 
-    "should add resource as object with path": function (done) {
+    "adds resource as object with path": function (done) {
         var group = bcGroup.create({
             resources: [
                 {path:"foo.js"}
@@ -66,7 +66,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should respect custom headers": function (done) {
+    "respects custom headers": function (done) {
         var group = bcGroup.create({
             resources: [
                 {path:"foo.js",headers:{"X-Foo":"Bar"}}
@@ -82,7 +82,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should set etag": function (done) {
+    "sets etag": function (done) {
         var group = bcGroup.create({
             resources: [
                 "foo.js"
@@ -99,7 +99,7 @@ buster.testCase("buster-configuration group", {
        });
     },
 
-    "should fail for missing file": function (done) {
+    "fails for missing file": function (done) {
         var group = bcGroup.create({
             resources: [
                 "/does/not/exist.js"
@@ -114,7 +114,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add backend resource": function (done) {
+    "adds backend resource": function (done) {
         var group = bcGroup.create({
             resources: [
                 {path:"foo",backend:"http://10.0.0.1/"}
@@ -129,7 +129,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add combined resources": function (done) {
+    "adds combined resources": function (done) {
         var group = bcGroup.create({
             resources: [
                 "foo.js",
@@ -146,7 +146,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add combined resources with glob pattern": function (done) {
+    "adds combined resources with glob pattern": function (done) {
         var group = bcGroup.create({
             resources: [
                 "foo.js",
@@ -163,7 +163,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add resources with content for file that does not exist": function (done) {
+    "adds resources with content for file that does not exist": function (done) {
         var group = bcGroup.create({
             resources: [
                 {path:"/does-not-exist.txt", content:"Hello, World"}
@@ -179,7 +179,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add resources with content for file that exists": function (done) {
+    "adds resources with content for file that exists": function (done) {
         var group = bcGroup.create({
             resources: [
                 {path:"/foo.js", content:"Hello, World"}
@@ -195,7 +195,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add source files to load and add them as file resources": function (done) {
+    "adds source files to load and add them as file resources": function (done) {
         var group = bcGroup.create({
             sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
@@ -206,7 +206,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should add source files via glob pattern": function (done) {
+    "adds source files via glob pattern": function (done) {
         var group = bcGroup.create({
             sources: ["*.js"]
         }, __dirname + "/fixtures");
@@ -217,7 +217,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load libs, sources and tests in right order with globbing": function (done) {
+    "loads libs, sources and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
             libs: ["fo*.js"],
             sources: ["b*r.js"],
@@ -236,7 +236,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load deps, sources and specs in right order": function (done) {
+    "loads deps, sources and specs in right order": function (done) {
         var group = bcGroup.create({
             deps: ["fo*.js"],
             sources: ["b*r.js"],
@@ -255,7 +255,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load lib, deps and sources in right order": function (done) {
+    "loads lib, deps and sources in right order": function (done) {
         var group = bcGroup.create({
             deps: ["fo*.js"],
             libs: ["b*r.js"],
@@ -269,7 +269,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should load libs, src and sources in right order": function (done) {
+    "loads libs, src and sources in right order": function (done) {
         var group = bcGroup.create({
             libs: ["fo*.js"],
             src: ["b*r.js"],
@@ -283,7 +283,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should parse server address": function () {
+    "parses server address": function () {
         var group = bcGroup.create({
             server: "http://localhost:1234/buster"
         }, __dirname + "/fixtures");
@@ -295,7 +295,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should parse server address without path": function () {
+    "parses server address without path": function () {
         var group = bcGroup.create({
             server: "http://localhost:1234"
         }, __dirname + "/fixtures");
@@ -307,7 +307,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should provide list of all items in load with absolute paths": function (done) {
+    "provides list of all items in load with absolute paths": function (done) {
         var group = bcGroup.create({
             libs: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
@@ -319,7 +319,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should set environment": function () {
+    "sets environment": function () {
         var group = bcGroup.create({
             environment: "node"
         }, __dirname + "/fixtures");
@@ -327,14 +327,14 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.environment, "node");
     },
 
-    "should default environment to browser": function () {
+    "defaults environment to browser": function () {
         var group = bcGroup.create({
         }, __dirname + "/fixtures");
 
         assert.equals(group.environment, "browser");
     },
 
-    "should set environment via env shorthand": function () {
+    "sets environment via env shorthand": function () {
         var group = bcGroup.create({
             env: "node"
         }, __dirname + "/fixtures");
@@ -342,7 +342,7 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.environment, "node");
     },
 
-    "should set autoRun option": function () {
+    "sets autoRun option": function () {
         var group = bcGroup.create({
             autoRun: true
         }, __dirname + "/fixtures");
@@ -350,13 +350,13 @@ buster.testCase("buster-configuration group", {
         assert.equals(group.options.autoRun, true);
     },
 
-    "should not default autoRun option": function () {
+    "does not default autoRun option": function () {
         var group = bcGroup.create({}, __dirname + "/fixtures");
 
         refute("autoRun" in group.options);
     },
 
-    "should support duplicate items in sources": function (done) {
+    "supports duplicate items in sources": function (done) {
         // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
         var group = bcGroup.create({
             sources: ["foo.js", "foo.js", "*.js"]
@@ -365,7 +365,7 @@ buster.testCase("buster-configuration group", {
         assertContainsFooAndBar(group, done);
     },
 
-    "should add bundle groups for framework resources": function (done) {
+    "adds bundle groups for framework resources": function (done) {
         var group = bcGroup.create({}, __dirname + "/fixtures");
 
         group.resolve().then(function () {
@@ -385,7 +385,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should pass itself as the promise resolution": function (done) {
+    "passes itself as the promise resolution": function (done) {
         var group = bcGroup.create({
             libs: ["foo.js"]
         }, __dirname + "/fixtures");
@@ -396,7 +396,7 @@ buster.testCase("buster-configuration group", {
         });
     },
 
-    "should not resolve multiple times": function (done) {
+    "does not resolve multiple times": function (done) {
         var group = bcGroup.create({
             libs: ["foo.js"]
         }, __dirname + "/fixtures");
