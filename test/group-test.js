@@ -473,7 +473,7 @@ buster.testCase("configuration group", {
             });
         },
 
-        "fires testss once for specs/tests": function (done) {
+        "fires tests once for specs/tests": function (done) {
             var group = bcGroup.create({
                 tests: ["foo.js"], specs: ["bar.js"]
             }, __dirname + "/fixtures");
