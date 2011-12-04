@@ -441,6 +441,20 @@ buster.testCase("configuration group", {
             assertContainsFooAndBar(group, done);
         },
 
+        "provides rootPath to resolve paths": function (done) {
+            var group = bcGroup.create({
+                deps: ["foo.js"]
+            }, __dirname + "/fixtures");
+
+            var listener = this.spy();
+            group.on("load:dependencies", listener);
+
+            group.resolve().then(function () {
+                assert.calledWith(listener, ["foo.js"], __dirname + "/fixtures");
+                done();
+            });
+        },
+
         "fires dependencies only once for libs/deps": function (done) {
             var group = bcGroup.create({
                 deps: ["foo.js"], libs: ["bar.js"]
