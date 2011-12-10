@@ -218,6 +218,18 @@ buster.testCase("configuration group", {
         });
     },
 
+    "adds source outside root directory": function (done) {
+        var group = bcGroup.create({
+            sources: ["../foo.js", "../bar.js"]
+        }, __dirname + "/fixtures/test");
+
+        group.resolve().then(function () {
+            assert.equals(group.resourceSet.load.length, 2);
+            assert.match(group.resourceSet.load[0], "foo.js");
+            done();
+        });
+    },
+
     "loads libs, sources and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
             libs: ["fo*.js"],
