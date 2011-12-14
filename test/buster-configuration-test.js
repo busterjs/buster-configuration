@@ -76,7 +76,7 @@ buster.testCase("buster-configuration", {
 
         this.c.resolveGroups(function (err) {
             assert.defined(err);
-            assert.match(err, "ENOENT");
+            assert.match(err.message, "matched no files");
             done();
         }.bind(this));
     },
@@ -131,7 +131,7 @@ buster.testCase("buster-configuration", {
 
         this.c.resolveGroups(function (err) {
             assert.match(err, "Unknown configuration option 'load'");
-            assert.match(err, "Did you mean one of: deps, libs, src, sources, tests, specs?");
+            assert.match(err, "Did you mean one of: deps, libs, src, sources, testLibs, tests, specLibs, specs?");
             done();
         }.bind(this));
     },

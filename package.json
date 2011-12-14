@@ -19,7 +19,7 @@
         "url": "git://gitorious.org/buster/buster-configuration.git"
     },
     "dependencies": {
-        "buster-core": "~0.5",
+        "buster-core": ">=0.5.1",
         "buster-promise": "~0.4",
         "buster-resources": "~0.1",
         "buster-module-loader": "~0.3",

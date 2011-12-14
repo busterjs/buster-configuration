@@ -4,32 +4,173 @@ var refute = buster.refute;
 var bcGroup = require("../lib/group");
 var moduleLoader = require("buster-module-loader");
 
+function assertContainsResources(group, resources, done) {
+    group.resolve().then(function (resourceSet) {
+        assert.equals(Object.keys(resourceSet.resources).sort(), resources.slice().sort());
+        done();
+    });
+}
+
+function assertResource(group, path, content, done) {
+    group.resolve().then(function (resourceSet) {
+        resourceSet.getResource(path, function (err, resource) {
+            refute.defined(err);
+            assert.equals(resource.content, content);
+            done();
+        });
+    });
+}
+
+function assertLoad(group, load, done) {
+    group.resolve().then(function (resourceSet) {
+        assert.equals(resourceSet.load, load);
+        done();
+    }, function (err) {
+        buster.log(err);
+        assert(false);
+        done();
+    });
+}
+
 buster.testCase("configuration group", {
     "creates resources with root path": function (done) {
         var group = bcGroup.create({
-            resources: [
-                "foo.js",
-                "bar.js"
-            ]
+            resources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done);
+        assertContainsResources(group, ["/bar.js", "/foo.js"], done);
     },
 
     "gets file contents as actual content": function (done) {
         var group = bcGroup.create({
-            resources: [
-                "foo.js"
-            ]
+            resources: ["foo.js"]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function () {
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
+        group.resolve().then(function (resourceSet) {
+            resourceSet.getResource("/foo.js", function (err, resource) {
                 refute.defined(err);
                 assert.equals(resource.content, "var thisIsTheFoo = 5;");
                 done();
             });
         });
+    },
+
+    "resolves globs": function (done) {
+        var group = bcGroup.create({
+            resources: ["*.js"]
+        }, __dirname + "/fixtures");
+
+        assertContainsResources(group, ["/bar.js", "/foo.js"], done);
+    },
+
+    "adds resource as object with path": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path: "foo.js" }]
+        }, __dirname + "/fixtures");
+
+        assertContainsResources(group, ["/foo.js"], done);
+    },
+
+    "respects custom headers": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path: "foo.js", headers: { "X-Foo": "Bar" } }]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function (resourceSet) {
+            resourceSet.getResource("/foo.js", function (err, resource) {
+                refute.defined(err);
+                assert.match(resource.headers, { "X-Foo": "Bar" });
+                done();
+            });
+        });
+    },
+
+    "fails for missing file": function (done) {
+        var group = bcGroup.create({
+            resources: ["/does/not/exist.js"]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function () {
+        }, function (err) {
+            assert.match(err.message, "/does/not/exist.js");
+            assert.match(err.message, "matched no files");
+            done();
+        });
+    },
+
+    "fails for file outside root": function (done) {
+        var group = bcGroup.create({
+            resources: ["../*.js"]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function (rs) {
+            buster.log(rs.resources);
+        }, function (err) {
+            assert.match(err.message, "../buster.js");
+            assert.match(err.message, "outside the project root");
+            assert.match(err.message, "set rootPath to the desired root");
+            done();
+        });
+    },
+
+    "adds backend resource": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path: "foo", backend: "http://10.0.0.1/" }]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function (resourceSet) {
+            assert.equals(Object.keys(resourceSet.resources), ["/foo"]);
+            assert.equals(resourceSet.resources["/foo"].backend, "http://10.0.0.1/");
+            done();
+        });
+    },
+
+    "adds combined resources": function (done) {
+        var group = bcGroup.create({
+            resources: ["foo.js", "bar.js",
+                        { path: "/bundle.js", combine: ["/foo.js", "/bar.js"] }]
+        }, __dirname + "/fixtures");
+
+        group.resolve().then(function (resourceSet) {
+            var resource = resourceSet.resources["/bundle.js"];
+            assert.defined(resource);
+            assert.equals(resource.combine, ["/foo.js", "/bar.js"]);
+            done();
+        });
+    },
+
+    "adds resources with content for file that does not exist": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path:"/does-not-exist.txt", content: "Hello, World" }]
+        }, __dirname + "/fixtures");
+
+        assertResource(group, "/does-not-exist.txt", "Hello, World", done);
+    },
+
+    "adds resources with content for file that exists": function (done) {
+        var group = bcGroup.create({
+            resources: [{ path: "/foo.js", content: "Hello, World" }]
+        }, __dirname + "/fixtures");
+
+        assertResource(group, "/foo.js", "Hello, World", done);
+    },
+
+    "loads resource as source": function (done) {
+        var group = bcGroup.create({
+            resources: ["foo.js"],
+            sources: ["foo.js"]
+        }, __dirname + "/fixtures");
+
+        assertLoad(group, ["/foo.js"], done);
+    },
+
+    "adds source files to load and add them as file resources": function (done) {
+        var group = bcGroup.create({
+            sources: ["foo.js", "bar.js"]
+        }, __dirname + "/fixtures");
+
+        assertContainsResources(group, ["/foo.js", "/bar.js"], done);
+        assertLoad(group, ["/foo.js", "/bar.js"], done);
     },
 
     "creates group without file system access": function (done) {
@@ -38,173 +179,10 @@ buster.testCase("configuration group", {
             sources: ["/hey"]
         });
 
-        group.resolve().then(function () {
-            assert.equals(group.resourceSet.load, ["/hey"]);
+        group.resolve().then(function (resourceSet) {
+            assert.equals(resourceSet.load, ["/hey"]);
             done();
         }.bind(this));
-    },
-
-    "resolves globs": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                "*.js"
-            ]
-        }, __dirname + "/fixtures");
-
-        assertContainsFooAndBar(group, done);
-    },
-
-    "adds resource as object with path": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                {path:"foo.js"}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            assert("/foo.js" in group.resourceSet.resources);
-            done();
-        });
-    },
-
-    "respects custom headers": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                {path:"foo.js",headers:{"X-Foo":"Bar"}}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
-                refute.defined(err);
-                assert.match(resource.headers, {"X-Foo": "Bar"});
-                done();
-            });
-        });
-    },
-
-    "sets etag": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                "foo.js"
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
-                refute.defined(err);
-                assert("etag" in resource);
-                // TODO: Should probably test more here.
-                done();
-            });
-       });
-    },
-
-    "fails for missing file": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                "/does/not/exist.js"
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-        }, function (err) {
-            assert.match(err, "ENOENT");
-            assert.match(err, "/does/not/exist.js");
-            done();
-        });
-    },
-
-    "adds backend resource": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                {path:"foo",backend:"http://10.0.0.1/"}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            assert("/foo" in group.resourceSet.resources);
-            var resource = group.resourceSet.resources["/foo"];
-            assert.equals(resource.backend, "http://10.0.0.1/");
-            done();
-        });
-    },
-
-    "adds combined resources": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                "foo.js",
-                "bar.js",
-                {path: "/bundle.js", combine: ["foo.js", "bar.js"]}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            assert("/bundle.js" in group.resourceSet.resources);
-            var resource = group.resourceSet.resources["/bundle.js"];
-            assert.equals(resource.combine, ["/foo.js", "/bar.js"]);
-            done();
-        });
-    },
-
-    "adds combined resources with glob pattern": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                "foo.js",
-                "bar.js",
-                {path: "/bundle.js", combine: ["*.js"]}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            assert(true);
-            var resource = group.resourceSet.resources["/bundle.js"];
-            assert.equals(resource.combine.sort(), ["/foo.js", "/bar.js"].sort());
-            done();
-        });
-    },
-
-    "adds resources with content for file that does not exist": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                {path:"/does-not-exist.txt", content:"Hello, World"}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            group.resourceSet.getResource("/does-not-exist.txt", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "Hello, World");
-                done();
-            });
-        });
-    },
-
-    "adds resources with content for file that exists": function (done) {
-        var group = bcGroup.create({
-            resources: [
-                {path:"/foo.js", content:"Hello, World"}
-            ]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-            group.resourceSet.getResource("/foo.js", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "Hello, World");
-                done();
-            });
-        });
-    },
-
-    "adds source files to load and add them as file resources": function (done) {
-        var group = bcGroup.create({
-            sources: ["foo.js", "bar.js"]
-        }, __dirname + "/fixtures");
-
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
-            done();
-        });
     },
 
     "adds source files via glob pattern": function (done) {
@@ -212,22 +190,7 @@ buster.testCase("configuration group", {
             sources: ["*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js"].sort(), group.resourceSet.load.sort());
-            done();
-        });
-    },
-
-    "adds source outside root directory": function (done) {
-        var group = bcGroup.create({
-            sources: ["../foo.js", "../bar.js"]
-        }, __dirname + "/fixtures/test");
-
-        group.resolve().then(function () {
-            assert.equals(group.resourceSet.load.length, 2);
-            assert.match(group.resourceSet.load[0], "foo.js");
-            done();
-        });
+        assertContainsResources(group, ["/foo.js", "/bar.js"], done);
     },
 
     "loads libs, sources and tests in right order with globbing": function (done) {
@@ -237,145 +200,120 @@ buster.testCase("configuration group", {
             tests: ["test/*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
+        var paths = ["/foo.js", "/bar.js", "/test/my-testish.js"];
+        var callback = buster.countdown(2, done);
 
-            assert("/test/my-testish.js" in group.resourceSet.resources);
-            group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "{};");
-                done();
-            });
-        });
+        assertContainsResources(group, paths, callback);
+        assertLoad(group, paths, callback);
+    },
+
+    "loads tests and testHelpers in right order": function (done) {
+        var group = bcGroup.create({
+            testLibs: ["test/*.js"],
+            tests: ["b*r.js"]
+        }, __dirname + "/fixtures");
+
+        var paths = ["/test/my-testish.js", "/bar.js"];
+        var callback = buster.countdown(2, done);
+
+        assertContainsResources(group, paths, callback);
+        assertLoad(group, paths, callback);
     },
 
     "loads deps, sources and specs in right order": function (done) {
         var group = bcGroup.create({
-            deps: ["fo*.js"],
-            sources: ["b*r.js"],
-            specs: ["test/*.js"]
+            deps: ["fo*.js"], src: ["b*r.js"], specs: ["test/*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"], group.resourceSet.load);
-
-            assert("/test/my-testish.js" in group.resourceSet.resources);
-            group.resourceSet.getResource("/test/my-testish.js", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "{};");
-                done();
-            });
-        });
+        assertLoad(group, ["/foo.js", "/bar.js", "/test/my-testish.js"], done);
     },
 
-    "loads lib, deps and sources in right order": function (done) {
+    "loads libs, deps and sources in right order": function (done) {
         var group = bcGroup.create({
-            deps: ["fo*.js"],
-            libs: ["b*r.js"],
-            sources: ["test/*.js"]
+            deps: ["fo*.js"], libs: ["b*r.js"], sources: ["test/*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"],
-                          group.resourceSet.load);
-            done();
-        });
+        assertLoad(group, ["/foo.js", "/bar.js", "/test/my-testish.js"], done);
+    },
+
+    "loads test libs and spec libs in right order": function (done) {
+        var group = bcGroup.create({
+            specLibs: ["fo*.js"],
+            testLibs: ["b*r.js"]
+        }, __dirname + "/fixtures");
+
+        assertLoad(group, ["/foo.js", "/bar.js"], done);
     },
 
     "loads libs, src and sources in right order": function (done) {
         var group = bcGroup.create({
-            libs: ["fo*.js"],
-            src: ["b*r.js"],
-            sources: ["test/*.js"]
+            libs: ["ba*.js"], src: ["f*.js"], sources: ["test/*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, function () {
-            assert.equals(["/foo.js", "/bar.js", "/test/my-testish.js"],
-                          group.resourceSet.load);
-            done();
-        });
+        assertLoad(group, ["/bar.js", "/foo.js", "/test/my-testish.js"], done);
     },
 
-    "parses server address": function () {
-        var group = bcGroup.create({
-            server: "http://localhost:1234/buster"
-        }, __dirname + "/fixtures");
+    "server address": {
+        "is parsed": function () {
+            var group = bcGroup.create({
+                server: "http://localhost:1234/buster"
+            }, __dirname + "/fixtures");
 
-        assert.match(group.server, {
-            hostname: "localhost",
-            port: 1234,
-            pathname: "/buster"
-        });
+            assert.match(group.server, {
+                hostname: "localhost",
+                port: 1234,
+                pathname: "/buster"
+            });
+        },
+
+        "is parsed without path": function () {
+            var group = bcGroup.create({
+                server: "http://localhost:1234"
+            }, __dirname + "/fixtures");
+
+            assert.match(group.server, {
+                hostname: "localhost",
+                port: 1234,
+                pathname: "/"
+            });
+        }
     },
 
-    "parses server address without path": function () {
-        var group = bcGroup.create({
-            server: "http://localhost:1234"
-        }, __dirname + "/fixtures");
+    "environments": {
+        "is set": function () {
+            var group = bcGroup.create({ environment: "node" });
+            assert.equals(group.environment, "node");
+        },
 
-        assert.match(group.server, {
-            hostname: "localhost",
-            port: 1234,
-            pathname: "/"
-        });
+        "defaults to browser": function () {
+            var group = bcGroup.create({});
+            assert.equals(group.environment, "browser");
+        },
+
+        "is set via env shorthand": function () {
+            var group = bcGroup.create({ env: "node" });
+            assert.equals(group.environment, "node");
+        }
     },
 
-    "provides list of all items in load with absolute paths": function (done) {
-        var group = bcGroup.create({
-            libs: ["foo.js", "bar.js"]
-        }, __dirname + "/fixtures");
+    "autoRun": {
+        "is set": function () {
+            var group = bcGroup.create({ autoRun: true });
+            assert.equals(group.options.autoRun, true);
+        },
 
-        group.resolve().then(function () {
-            var expected = [__dirname + "/fixtures/foo.js", __dirname + "/fixtures/bar.js"];
-            assert.equals(group.absoluteLoadEntries, expected);
-            done();
-        });
+        "is not set by default": function () {
+            var group = bcGroup.create({});
+            refute.defined(group.options.autoRun);
+        }
     },
 
-    "sets environment": function () {
-        var group = bcGroup.create({
-            environment: "node"
-        }, __dirname + "/fixtures");
-
-        assert.equals(group.environment, "node");
-    },
-
-    "defaults environment to browser": function () {
-        var group = bcGroup.create({
-        }, __dirname + "/fixtures");
-
-        assert.equals(group.environment, "browser");
-    },
-
-    "sets environment via env shorthand": function () {
-        var group = bcGroup.create({
-            env: "node"
-        }, __dirname + "/fixtures");
-
-        assert.equals(group.environment, "node");
-    },
-
-    "sets autoRun option": function () {
-        var group = bcGroup.create({
-            autoRun: true
-        }, __dirname + "/fixtures");
-
-        assert.equals(group.options.autoRun, true);
-    },
-
-    "does not default autoRun option": function () {
-        var group = bcGroup.create({}, __dirname + "/fixtures");
-
-        refute("autoRun" in group.options);
-    },
-
-    "supports duplicate items in sources": function (done) {
-        // Useful for stuff like ["lib/must-be-first.js", "lib/*.js"]
+    "supports duplicate items in sources to allow simple ordering": function (done) {
         var group = bcGroup.create({
             sources: ["foo.js", "foo.js", "*.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsFooAndBar(group, done);
+        assertLoad(group, ["/foo.js", "/bar.js"], done);
     },
 
     "framework resources": {
@@ -415,26 +353,14 @@ buster.testCase("configuration group", {
         }
     },
 
-    "passes itself as the promise resolution": function (done) {
-        var group = bcGroup.create({
-            libs: ["foo.js"]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function (gr) {
-            assert.same(gr, group);
-            done();
-        });
-    },
-
     "does not resolve multiple times": function (done) {
         var group = bcGroup.create({
             libs: ["foo.js"]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function () {
-            var resourceSet = group.resourceSet;
-            group.resolve().then(function () {
-                assert.same(group.resourceSet, resourceSet);
+        group.resolve().then(function (resourceSet) {
+            group.resolve().then(function (rs) {
+                assert.same(resourceSet, rs);
                 done();
             });
         });
@@ -446,23 +372,26 @@ buster.testCase("configuration group", {
                 deps: ["foo.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:dependencies", function (deps) {
-                deps.push("bar.js");
+            group.on("load:libs", function (libs) {
+                libs.push("bar.js");
             });
 
-            assertContainsFooAndBar(group, done);
+            assertLoad(group, ["/foo.js", "/bar.js"], done);
         },
 
-        "provides rootPath to resolve paths": function (done) {
+        "triggers with resolved glob patterns": function (done) {
             var group = bcGroup.create({
-                deps: ["foo.js"]
+                deps: ["*.js"]
             }, __dirname + "/fixtures");
 
-            var listener = this.spy();
-            group.on("load:dependencies", listener);
+            var resources = [];
+            group.on("load:libs", function (libs) {
+                resources.push(libs[0]);
+                resources.push(libs[1]);
+            });
 
             group.resolve().then(function () {
-                assert.calledWith(listener, ["foo.js"], __dirname + "/fixtures");
+                assert.equals(resources, ["bar.js", "foo.js"]);
                 done();
             });
         },
@@ -472,9 +401,9 @@ buster.testCase("configuration group", {
                 deps: ["foo.js"], libs: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:dependencies", function (deps) {
-                deps.shift();
-                deps.shift();
+            group.on("load:libs", function (libs) {
+                libs.shift();
+                libs.shift();
             });
 
             group.resolve().then(function () {
@@ -488,9 +417,9 @@ buster.testCase("configuration group", {
                 src: ["foo.js"], sources: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:sources", function (deps) {
-                deps.shift();
-                deps.shift();
+            group.on("load:sources", function (sources) {
+                sources.shift();
+                sources.shift();
             });
 
             group.resolve().then(function () {
@@ -504,9 +433,9 @@ buster.testCase("configuration group", {
                 tests: ["foo.js"], specs: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:tests", function (deps) {
-                deps.shift();
-                deps.shift();
+            group.on("load:tests", function (tests) {
+                tests.shift();
+                tests.shift();
             });
 
             group.resolve().then(function () {
@@ -539,10 +468,10 @@ buster.testCase("configuration group", {
                 sources: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            this.group.resolve().then(function (parent) {
+            this.group.resolve().then(function (rs) {
                 group.resolve().then(function () {
                     assert("/bar.js" in group.resourceSet.resources);
-                    refute("/bar.js" in parent.resourceSet.resources);
+                    refute("/bar.js" in rs.resources);
                     done();
                 });
             });
@@ -553,8 +482,8 @@ buster.testCase("configuration group", {
                 sources: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {
-                assert.equals(group.resourceSet.load, ["/foo.js", "/bar.js"]);
+            group.resolve().then(function (resourceSet) {
+                assert.equals(resourceSet.load, ["/foo.js", "/bar.js"]);
                 done();
             });
         },
@@ -564,9 +493,9 @@ buster.testCase("configuration group", {
                 tests: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            this.group.resolve().then(function (parent) {
+            this.group.resolve().then(function (resourceSet) {
                 group.resolve().then(function () {
-                    assert.equals(parent.resourceSet.load, ["/foo.js"]);
+                    assert.equals(resourceSet.load, ["/foo.js"]);
                     done();
                 });
             });
@@ -577,8 +506,8 @@ buster.testCase("configuration group", {
                 libs: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {
-                assert.equals(group.resourceSet.load, ["/foo.js", "/bar.js"]);
+            group.resolve().then(function (resourceSet) {
+                assert.equals(resourceSet.load, ["/foo.js", "/bar.js"]);
                 done();
             });
         },
@@ -684,22 +613,29 @@ buster.testCase("configuration group", {
                 done();
             }.bind(this));
         }
-    }
-});
+    },
 
-function assertContainsFooAndBar(group, done) {
-    group.resolve().then(function () {
-        assert("/foo.js" in group.resourceSet.resources);
-        assert("/bar.js" in group.resourceSet.resources);
+    "unknown options": {
+        "cause an error": function (done) {
+            var group = bcGroup.create({
+                thingie: "Oh noes"
+            });
 
-        group.resourceSet.getResource("/foo.js", function (err, resource) {
-            refute.defined(err);
-            assert.equals(resource.content, "var thisIsTheFoo = 5;");
-            group.resourceSet.getResource("/bar.js", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "var helloFromBar = 1;");
+            group.resolve().then(function () {}, function (err) {
+                assert.defined(err);
                 done();
             });
-        });
-    });
-}
+        },
+
+        "include custom message": function (done) {
+            var group = bcGroup.create({
+                load: [""]
+            });
+
+            group.resolve().then(function () {}, function (err) {
+                assert.match(err, "Did you mean one of");
+                done();
+            });
+        }
+    }
+});
