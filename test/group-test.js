@@ -131,12 +131,11 @@ buster.testCase("configuration group", {
                         { path: "/bundle.js", combine: ["/foo.js", "/bar.js"] }]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function (resourceSet) {
+        group.resolve().then(done(function (resourceSet) {
             var resource = resourceSet.resources["/bundle.js"];
             assert.defined(resource);
             assert.equals(resource.combine, ["/foo.js", "/bar.js"]);
-            done();
-        });
+        }));
     },
 
     "adds resources with content for file that does not exist": function (done) {
@@ -169,8 +168,9 @@ buster.testCase("configuration group", {
             sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
-        assertContainsResources(group, ["/foo.js", "/bar.js"], done);
-        assertLoad(group, ["/foo.js", "/bar.js"], done);
+        var next = buster.countdown(2, done);
+        assertContainsResources(group, ["/foo.js", "/bar.js"], next);
+        assertLoad(group, ["/foo.js", "/bar.js"], next);
     },
 
     "creates group without file system access": function (done) {
