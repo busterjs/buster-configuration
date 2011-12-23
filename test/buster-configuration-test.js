@@ -70,6 +70,15 @@ buster.testCase("buster-configuration", {
         }.bind(this));
     },
 
+    "resolves with groups": function (done) {
+        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
+        this.c.addGroup("My group 2", {sources: ["fixtures/bar.js"]}, this.rootPath);
+
+        this.c.resolveGroups(done(function (err, groups) {
+            assert.equals(groups, this.c.groups);
+        }.bind(this)));
+    },
+
     "resolves all groups with error": function (done) {
         this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
         this.c.addGroup("My group 2", {sources: ["fixtures/does-not-exist.js"]}, this.rootPath);
