@@ -20,8 +20,8 @@
     },
     "dependencies": {
         "buster-core": ">=0.5.1",
-        "buster-promise": "~0.4",
-        "buster-resources": "~0.1",
+        "when": ">=0.10",
+        "buster-resources": ">=0.2",
         "buster-module-loader": "~0.3",
         "buster-glob": "~0.1",
         "buster-evented-logger": "~0.4",

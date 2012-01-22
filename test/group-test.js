@@ -6,24 +6,27 @@ var moduleLoader = require("buster-module-loader");
 
 function assertContainsResources(group, resources, done) {
     group.resolve().then(function (resourceSet) {
-        assert.equals(Object.keys(resourceSet.resources).sort(), resources.slice().sort());
+        resources.forEach(function (path) {
+            assert.isObject(resourceSet.get(path));
+        });
         done();
     });
 }
 
 function assertResource(group, path, content, done) {
     group.resolve().then(function (resourceSet) {
-        resourceSet.getResource(path, function (err, resource) {
-            refute.defined(err);
-            assert.equals(resource.content, content);
-            done();
-        });
+        var resource = resourceSet.get(path)
+        assert.defined(resource);
+        resource.content().then(function (actual) {
+            assert.equals(actual, content);
+            done()
+        }, done);
     });
 }
 
 function assertLoad(group, load, done) {
     group.resolve().then(function (resourceSet) {
-        assert.equals(resourceSet.load, load);
+        assert.equals(resourceSet.loadPath.paths(), load);
         done();
     }, function (err) {
         buster.log(err);
@@ -47,11 +50,9 @@ buster.testCase("configuration group", {
         }, __dirname + "/fixtures");
 
         group.resolve().then(function (resourceSet) {
-            resourceSet.getResource("/foo.js", function (err, resource) {
-                refute.defined(err);
-                assert.equals(resource.content, "var thisIsTheFoo = 5;");
-                done();
-            });
+            resourceSet.get("/foo.js").content().then(done(function (content) {
+                assert.equals(content, "var thisIsTheFoo = 5;");
+            }));
         });
     },
 
@@ -65,7 +66,7 @@ buster.testCase("configuration group", {
 
     "adds resource as object with path": function (done) {
         var group = bcGroup.create({
-            resources: [{ path: "foo.js" }]
+            resources: [{ path: "foo.js", content: "Ok" }]
         }, __dirname + "/fixtures");
 
         assertContainsResources(group, ["/foo.js"], done);
@@ -73,29 +74,16 @@ buster.testCase("configuration group", {
 
     "respects custom headers": function (done) {
         var group = bcGroup.create({
-            resources: [{ path: "foo.js", headers: { "X-Foo": "Bar" } }]
+            resources: [{
+                path: "foo.js",
+                content: "Ok",
+                headers: { "X-Foo": "Bar" }
+            }]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(function (resourceSet) {
-            resourceSet.getResource("/foo.js", function (err, resource) {
-                refute.defined(err);
-                assert.match(resource.headers, { "X-Foo": "Bar" });
-                done();
-            });
-        });
-    },
-
-    "fails for missing file": function (done) {
-        var group = bcGroup.create({
-            resources: ["/does/not/exist.js"]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function () {
-        }, function (err) {
-            assert.match(err.message, "/does/not/exist.js");
-            assert.match(err.message, "matched no files");
-            done();
-        });
+        group.resolve().then(done(function (rs) {
+            assert.match(rs.get("/foo.js").headers(), {"X-Foo": "Bar"});
+        }));
     },
 
     "fails for file outside root": function (done) {
@@ -104,25 +92,22 @@ buster.testCase("configuration group", {
         }, __dirname + "/fixtures");
 
         group.resolve().then(function (rs) {
-            buster.log(rs.resources);
-        }, function (err) {
+            buster.log("Oops!");
+        }, done(function (err) {
             assert.match(err, "../buster.js");
             assert.match(err, "outside the project root");
             assert.match(err, "set rootPath to the desired root");
-            done();
-        });
+        }));
     },
 
     "adds backend resource": function (done) {
         var group = bcGroup.create({
             resources: [{ path: "foo", backend: "http://10.0.0.1/" }]
-        }, __dirname + "/fixtures");
-
-        group.resolve().then(function (resourceSet) {
-            assert.equals(Object.keys(resourceSet.resources), ["/foo"]);
-            assert.equals(resourceSet.resources["/foo"].backend, "http://10.0.0.1/");
-            done();
         });
+
+        group.resolve().then(done(function (resourceSet) {
+            assert.equals(resourceSet.get("/foo").backend, "http://10.0.0.1/");
+        }));
     },
 
     "adds combined resources": function (done) {
@@ -131,11 +116,8 @@ buster.testCase("configuration group", {
                         { path: "/bundle.js", combine: ["/foo.js", "/bar.js"] }]
         }, __dirname + "/fixtures");
 
-        group.resolve().then(done(function (resourceSet) {
-            var resource = resourceSet.resources["/bundle.js"];
-            assert.defined(resource);
-            assert.equals(resource.combine, ["/foo.js", "/bar.js"]);
-        }));
+        var combined = "var thisIsTheFoo = 5;var helloFromBar = 1;";
+        assertResource(group, "/bundle.js", combined, done);
     },
 
     "adds resources with content for file that does not exist": function (done) {
@@ -179,10 +161,7 @@ buster.testCase("configuration group", {
             sources: ["/hey"]
         });
 
-        group.resolve().then(function (resourceSet) {
-            assert.equals(resourceSet.load, ["/hey"]);
-            done();
-        }.bind(this));
+        assertLoad(group, ["/hey"], done);
     },
 
     "adds source files via glob pattern": function (done) {
@@ -325,32 +304,34 @@ buster.testCase("configuration group", {
             }.bind(this));
         },
 
-        "adds bundle groups": function () {
-            this.group.setupFrameworkResources();
+        // "//adds bundle groups": function (done) {
+        //     this.group.setupFrameworkResources().then(done(function (rs) {
+        //         var bundleResourceName = "/buster/bundle-0.2.1.js";
+        //         var bundleResource = rs.get(bundleResourceName);
+        //         assert.defined(bundleResource);
 
-            var bundleResourceName = "/buster/bundle-0.2.1.js";
-            var bundleResource = this.resourceSet.resources[bundleResourceName];
-            assert.defined(bundleResource);
+        //         var compatResourceName = "/buster/compat-0.2.1.js";
+        //         var compatResource = rs.get(compatResourceName);
+        //         assert.defined(compatResource);
 
-            var compatResourceName = "/buster/compat-0.2.1.js";
-            var compatResource = this.resourceSet.resources[compatResourceName];
-            assert.defined(compatResource);
+        //         assert.equals([bundleResourceName, compatResourceName],
+        //                       rs.loadPath.paths().slice(0, 2));
+        //     }), done(function (err) {
+        //         buster.log(err.stack || err);
+        //     }));
+        // },
 
-            assert.equals([bundleResourceName, compatResourceName],
-                          this.resourceSet.load.slice(0, 2));
-        },
+        // "//allows extension with events": function () {
+        //     this.group.on("load:resources", function (resourceSet) {
+        //         resourceSet.addResource("/stuff", {
+        //             content: "Oh yeah!"
+        //         });
+        //     });
+        //     this.group.setupFrameworkResources();
 
-        "allows extension with events": function () {
-            this.group.on("load:resources", function (resourceSet) {
-                resourceSet.addResource("/stuff", {
-                    content: "Oh yeah!"
-                });
-            });
-            this.group.setupFrameworkResources();
-
-            assert.defined(this.resourceSet.resources["/stuff"]);
-            assert.equals(this.resourceSet.resources["/stuff"].content, "Oh yeah!");
-        }
+        //     assert.defined(this.resourceSet.resources["/stuff"]);
+        //     assert.equals(this.resourceSet.resources["/stuff"].content, "Oh yeah!");
+        // }
     },
 
     "does not resolve multiple times": function (done) {
@@ -372,8 +353,8 @@ buster.testCase("configuration group", {
                 deps: ["foo.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:libs", function (libs) {
-                libs.push("bar.js");
+            group.on("load:libs", function (resourceSet) {
+                resourceSet.appendLoad("bar.js");
             });
 
             assertLoad(group, ["/foo.js", "/bar.js"], done);
@@ -385,15 +366,14 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             var resources = [];
-            group.on("load:libs", function (libs) {
-                resources.push(libs[0]);
-                resources.push(libs[1]);
+            group.on("load:libs", function (resourceSet) {
+                resources.push(resourceSet[0].path);
+                resources.push(resourceSet[1].path);
             });
 
-            group.resolve().then(function () {
-                assert.equals(resources, ["bar.js", "foo.js"]);
-                done();
-            });
+            group.resolve().then(done(function () {
+                assert.equals(resources, ["/bar.js", "/foo.js"]);
+            }));
         },
 
         "fires dependencies only once for libs/deps": function (done) {
@@ -401,15 +381,14 @@ buster.testCase("configuration group", {
                 deps: ["foo.js"], libs: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.on("load:libs", function (libs) {
-                libs.shift();
-                libs.shift();
+            group.on("load:libs", function (resourceSet) {
+                resourceSet.remove("/foo.js");
+                resourceSet.remove("/bar.js");
             });
 
-            group.resolve().then(function () {
-                assert.equals(group.resourceSet.resources, {});
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(resourceSet.length, 0);
+            }));
         },
 
         "fires sources once for src/sources": function (done) {
@@ -418,14 +397,14 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             group.on("load:sources", function (sources) {
-                sources.shift();
-                sources.shift();
+                sources.remove("/foo.js");
+                sources.remove("/bar.js");
             });
 
-            group.resolve().then(function () {
-                assert.equals(group.resourceSet.resources, {});
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(resourceSet.length, 0);
+                assert.equals(resourceSet.loadPath.paths(), []);
+            }));
         },
 
         "fires tests once for specs/tests": function (done) {
@@ -434,14 +413,12 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             group.on("load:tests", function (tests) {
-                tests.shift();
-                tests.shift();
+                tests.remove("/foo.js");
             });
 
-            group.resolve().then(function () {
-                assert.equals(group.resourceSet.resources, {});
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(resourceSet.length, 1);
+            }));
         }
     },
 
@@ -457,10 +434,9 @@ buster.testCase("configuration group", {
         "inherits libs from parent group": function (done) {
             var group = this.group.extend();
 
-            group.resolve().then(function () {
-                assert("/foo.js" in group.resourceSet.resources);
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.defined(resourceSet.get("/foo.js"));
+            }));
         },
 
         "does not modify parent group resources": function (done) {
@@ -469,11 +445,10 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             this.group.resolve().then(function (rs) {
-                group.resolve().then(function () {
-                    assert("/bar.js" in group.resourceSet.resources);
-                    refute("/bar.js" in rs.resources);
-                    done();
-                });
+                group.resolve().then(done(function (grs) {
+                    assert.defined(grs.get("/bar.js"));
+                    refute.defined(rs.get("/bar.js"));
+                }));
             });
         },
 
@@ -482,10 +457,10 @@ buster.testCase("configuration group", {
                 sources: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function (resourceSet) {
-                assert.equals(resourceSet.load, ["/foo.js", "/bar.js"]);
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(resourceSet.loadPath.paths(),
+                              ["/foo.js", "/bar.js"]);
+            }));
         },
 
         "does not modify parent group load": function (done) {
@@ -494,10 +469,9 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             this.group.resolve().then(function (resourceSet) {
-                group.resolve().then(function () {
-                    assert.equals(resourceSet.load, ["/foo.js"]);
-                    done();
-                });
+                group.resolve().then(done(function () {
+                    assert.equals(resourceSet.loadPath.paths(), ["/foo.js"]);
+                }));
             });
         },
 
@@ -506,10 +480,10 @@ buster.testCase("configuration group", {
                 libs: ["bar.js"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function (resourceSet) {
-                assert.equals(resourceSet.load, ["/foo.js", "/bar.js"]);
-                done();
-            });
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(resourceSet.loadPath.paths(),
+                              ["/foo.js", "/bar.js"]);
+            }));
         },
 
         "inherits server setting": function () {
@@ -554,10 +528,9 @@ buster.testCase("configuration group", {
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {
+            group.resolve().then(done(function () {
                 assert.calledOnceWith(moduleLoader.load, "baluba");
-                done();
-            });
+            }));
         },
 
         "loads all extensions": function (done) {
@@ -565,11 +538,10 @@ buster.testCase("configuration group", {
                 extensions: ["baluba", "swan"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {
+            group.resolve().then(done(function () {
                 assert.calledWith(moduleLoader.load, "baluba");
                 assert.calledWith(moduleLoader.load, "swan");
-                done();
-            });
+            }));
         },
 
         "calls configure on extensions": function (done) {
@@ -577,10 +549,9 @@ buster.testCase("configuration group", {
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {
+            group.resolve().then(done(function () {
                 assert.calledOnceWith(this.configure, group);
-                done();
-            }.bind(this));
+            }.bind(this)));
         },
 
         "fails gracefully if extension cannot be found": function (done) {
@@ -593,11 +564,10 @@ buster.testCase("configuration group", {
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {}, function (e) {
+            group.resolve().then(function () {}, done(function (e) {
                 assert.match(e.message, "Failed loading extensions");
                 assert.match(e.message, "Cannot find module 'baluba'");
-                done();
-            }.bind(this));
+            }.bind(this)));
         },
 
         "fails gracefully if extension has no configure method": function (done) {
@@ -607,11 +577,10 @@ buster.testCase("configuration group", {
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {}, function (e) {
+            group.resolve().then(function () {}, done(function (e) {
                 assert.match(e.message, "Failed loading extensions");
                 assert.match(e.message, "Extension 'baluba' has no 'configure' method");
-                done();
-            }.bind(this));
+            }.bind(this)));
         }
     },
 
