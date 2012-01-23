@@ -80,14 +80,13 @@ buster.testCase("buster-configuration", {
     },
 
     "resolves all groups with error": function (done) {
-        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
-        this.c.addGroup("My group 2", {sources: ["fixtures/does-not-exist.js"]}, this.rootPath);
+        this.c.addGroup("My group 1", { resources: [{ path: "/bogus" }] });
+        this.c.addGroup("My group 2", { resources: [{ path: "/bogus2" }] });
 
-        this.c.resolveGroups(function (err) {
+        this.c.resolveGroups(done(function (err) {
             assert.defined(err);
-            assert.match(err.message, "matched no files");
-            done();
-        }.bind(this));
+            assert.match(err.message, "must have content");
+        }.bind(this)));
     },
 
     "resolves group with custom root path": function (done) {
@@ -127,7 +126,7 @@ buster.testCase("buster-configuration", {
         });
 
         this.c.resolveGroups(function (err) {
-            assert.equals(group.resourceSet.load, ["/fixtures/foo.js"]);
+            assert.equals(group.resourceSet.loadPath.paths(), ["/fixtures/foo.js"]);
             assert(group.options.autoRun);
             done();
         }.bind(this));
