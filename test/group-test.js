@@ -304,34 +304,38 @@ buster.testCase("configuration group", {
             }.bind(this));
         },
 
-        // "//adds bundle groups": function (done) {
-        //     this.group.setupFrameworkResources().then(done(function (rs) {
-        //         var bundleResourceName = "/buster/bundle-0.2.1.js";
-        //         var bundleResource = rs.get(bundleResourceName);
-        //         assert.defined(bundleResource);
+        "adds bundle groups": function (done) {
+            this.group.setupFrameworkResources().then(done(function (rs) {
+                var bundleResourceName = "/buster/bundle-0.2.1.js";
+                var bundleResource = rs.get(bundleResourceName);
+                assert.defined(bundleResource);
 
-        //         var compatResourceName = "/buster/compat-0.2.1.js";
-        //         var compatResource = rs.get(compatResourceName);
-        //         assert.defined(compatResource);
+                var compatResourceName = "/buster/compat-0.2.1.js";
+                var compatResource = rs.get(compatResourceName);
+                assert.defined(compatResource);
 
-        //         assert.equals([bundleResourceName, compatResourceName],
-        //                       rs.loadPath.paths().slice(0, 2));
-        //     }), done(function (err) {
-        //         buster.log(err.stack || err);
-        //     }));
-        // },
+                assert.equals([bundleResourceName, compatResourceName],
+                              rs.loadPath.paths().slice(0, 2));
+            }), done(function (err) {
+                buster.log(err.stack || err);
+            }));
+        },
 
-        // "//allows extension with events": function () {
-        //     this.group.on("load:resources", function (resourceSet) {
-        //         resourceSet.addResource("/stuff", {
-        //             content: "Oh yeah!"
-        //         });
-        //     });
-        //     this.group.setupFrameworkResources();
+        "allows extension with events": function (done) {
+            this.group.on("load:resources", function (resourceSet) {
+                resourceSet.addResource({
+                    path: "/stuff",
+                    content: "Oh yeah!"
+                });
+            });
 
-        //     assert.defined(this.resourceSet.resources["/stuff"]);
-        //     assert.equals(this.resourceSet.resources["/stuff"].content, "Oh yeah!");
-        // }
+            this.group.setupFrameworkResources().then(function (rs) {
+                assert.defined(rs.get("/stuff"));
+                rs.get("/stuff").content().then(done(function (content) {
+                    assert.equals(content, "Oh yeah!");
+                }));
+            });
+        }
     },
 
     "does not resolve multiple times": function (done) {
