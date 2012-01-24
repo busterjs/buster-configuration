@@ -9,13 +9,13 @@ function assertContainsResources(group, resources, done) {
         resources.forEach(function (path) {
             assert.isObject(resourceSet.get(path));
         });
-        done();
+        done()
     });
 }
 
 function assertResource(group, path, content, done) {
     group.resolve().then(function (resourceSet) {
-        var resource = resourceSet.get(path)
+        var resource = resourceSet.get(path);
         assert.defined(resource);
         resource.content().then(function (actual) {
             assert.equals(actual, content);
@@ -28,11 +28,10 @@ function assertLoad(group, load, done) {
     group.resolve().then(function (resourceSet) {
         assert.equals(resourceSet.loadPath.paths(), load);
         done();
-    }, function (err) {
+    }, done(function (err) {
         buster.log(err);
         assert(false);
-        done();
-    });
+    }));
 }
 
 buster.testCase("configuration group", {
@@ -120,9 +119,12 @@ buster.testCase("configuration group", {
         assertResource(group, "/bundle.js", combined, done);
     },
 
-    "adds resources with content for file that does not exist": function (done) {
+    "adds resources with content for non-existent file": function (done) {
         var group = bcGroup.create({
-            resources: [{ path:"/does-not-exist.txt", content: "Hello, World" }]
+            resources: [{
+                path: "/does-not-exist.txt",
+                content: "Hello, World"
+            }]
         }, __dirname + "/fixtures");
 
         assertResource(group, "/does-not-exist.txt", "Hello, World", done);
@@ -145,7 +147,7 @@ buster.testCase("configuration group", {
         assertLoad(group, ["/foo.js"], done);
     },
 
-    "adds source files to load and add them as file resources": function (done) {
+    "adds sourcees to load and add them as file resources": function (done) {
         var group = bcGroup.create({
             sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
@@ -172,7 +174,7 @@ buster.testCase("configuration group", {
         assertContainsResources(group, ["/foo.js", "/bar.js"], done);
     },
 
-    "loads libs, sources and tests in right order with globbing": function (done) {
+    "libs, sources and tests in right order with globbing": function (done) {
         var group = bcGroup.create({
             libs: ["fo*.js"],
             sources: ["b*r.js"],
@@ -201,7 +203,9 @@ buster.testCase("configuration group", {
 
     "loads deps, sources and specs in right order": function (done) {
         var group = bcGroup.create({
-            deps: ["fo*.js"], src: ["b*r.js"], specs: ["test/*.js"]
+            deps: ["fo*.js"],
+            src: ["b*r.js"],
+            specs: ["test/*.js"]
         }, __dirname + "/fixtures");
 
         assertLoad(group, ["/foo.js", "/bar.js", "/test/my-testish.js"], done);
@@ -209,7 +213,9 @@ buster.testCase("configuration group", {
 
     "loads libs, deps and sources in right order": function (done) {
         var group = bcGroup.create({
-            deps: ["fo*.js"], libs: ["b*r.js"], sources: ["test/*.js"]
+            deps: ["fo*.js"],
+            libs: ["b*r.js"],
+            sources: ["test/*.js"]
         }, __dirname + "/fixtures");
 
         assertLoad(group, ["/foo.js", "/bar.js", "/test/my-testish.js"], done);
@@ -226,7 +232,9 @@ buster.testCase("configuration group", {
 
     "loads libs, src and sources in right order": function (done) {
         var group = bcGroup.create({
-            libs: ["ba*.js"], src: ["f*.js"], sources: ["test/*.js"]
+            libs: ["ba*.js"],
+            src: ["f*.js"],
+            sources: ["test/*.js"]
         }, __dirname + "/fixtures");
 
         assertLoad(group, ["/bar.js", "/foo.js", "/test/my-testish.js"], done);
@@ -287,7 +295,7 @@ buster.testCase("configuration group", {
         }
     },
 
-    "supports duplicate items in sources to allow simple ordering": function (done) {
+    "supports duplicate items in sources for ordering": function (done) {
         var group = bcGroup.create({
             sources: ["foo.js", "foo.js", "*.js"]
         }, __dirname + "/fixtures");
@@ -298,10 +306,9 @@ buster.testCase("configuration group", {
     "framework resources": {
         setUp: function (done) {
             this.group = bcGroup.create({}, __dirname + "/fixtures");
-            this.group.resolve().then(function () {
+            this.group.resolve().then(done(function () {
                 this.resourceSet = this.group.resourceSet;
-                done();
-            }.bind(this));
+            }.bind(this)));
         },
 
         "adds bundle groups": function (done) {
@@ -344,10 +351,9 @@ buster.testCase("configuration group", {
         }, __dirname + "/fixtures");
 
         group.resolve().then(function (resourceSet) {
-            group.resolve().then(function (rs) {
+            group.resolve().then(done(function (rs) {
                 assert.same(resourceSet, rs);
-                done();
-            });
+            }));
         });
     },
 
@@ -382,7 +388,8 @@ buster.testCase("configuration group", {
 
         "fires dependencies only once for libs/deps": function (done) {
             var group = bcGroup.create({
-                deps: ["foo.js"], libs: ["bar.js"]
+                deps: ["foo.js"],
+                libs: ["bar.js"]
             }, __dirname + "/fixtures");
 
             group.on("load:libs", function (resourceSet) {
@@ -397,7 +404,8 @@ buster.testCase("configuration group", {
 
         "fires sources once for src/sources": function (done) {
             var group = bcGroup.create({
-                src: ["foo.js"], sources: ["bar.js"]
+                src: ["foo.js"],
+                sources: ["bar.js"]
             }, __dirname + "/fixtures");
 
             group.on("load:sources", function (sources) {
@@ -413,7 +421,8 @@ buster.testCase("configuration group", {
 
         "fires tests once for specs/tests": function (done) {
             var group = bcGroup.create({
-                tests: ["foo.js"], specs: ["bar.js"]
+                tests: ["foo.js"],
+                specs: ["bar.js"]
             }, __dirname + "/fixtures");
 
             group.on("load:tests", function (tests) {
@@ -524,7 +533,9 @@ buster.testCase("configuration group", {
     "extensions": {
         setUp: function () {
             this.configure = this.spy();
-            this.stub(moduleLoader, "load").returns({ configure: this.configure });
+            this.stub(moduleLoader, "load").returns({
+                configure: this.configure
+            });
         },
 
         "loads modules with buster-module-loader": function (done) {
@@ -574,7 +585,7 @@ buster.testCase("configuration group", {
             }.bind(this)));
         },
 
-        "fails gracefully if extension has no configure method": function (done) {
+        "fails gracefully when no configure method": function (done) {
             moduleLoader.load.returns({});
 
             var group = bcGroup.create({
@@ -583,7 +594,8 @@ buster.testCase("configuration group", {
 
             group.resolve().then(function () {}, done(function (e) {
                 assert.match(e.message, "Failed loading extensions");
-                assert.match(e.message, "Extension 'baluba' has no 'configure' method");
+                assert.match(e.message,
+                             "Extension 'baluba' has no 'configure' method");
             }.bind(this)));
         }
     },
@@ -594,10 +606,9 @@ buster.testCase("configuration group", {
                 thingie: "Oh noes"
             });
 
-            group.resolve().then(function () {}, function (err) {
+            group.resolve().then(function () {}, done(function (err) {
                 assert.defined(err);
-                done();
-            });
+            }));
         },
 
         "include custom message": function (done) {
@@ -605,10 +616,9 @@ buster.testCase("configuration group", {
                 load: [""]
             });
 
-            group.resolve().then(function () {}, function (err) {
+            group.resolve().then(function () {}, done(function (err) {
                 assert.match(err, "Did you mean one of");
-                done();
-            });
+            }));
         }
     }
 });

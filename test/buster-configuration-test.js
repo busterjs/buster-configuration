@@ -54,25 +54,34 @@ buster.testCase("buster-configuration", {
 
         this.c.filterGroup(/test/);
         assert.equals(this.c.groups.length, 2);
-        assert.match(this.c.groups, [{name: "The test"}, {name: "test the foo"}]);
+        assert.match(this.c.groups, [{
+            name: "The test"
+        }, {name: "test the foo"}]);
     },
 
     "resolves all groups": function (done) {
-        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
-        this.c.addGroup("My group 2", {sources: ["fixtures/bar.js"]}, this.rootPath);
+        this.c.addGroup("My group 1", {
+            sources: ["fixtures/foo.js"]
+        }, this.rootPath);
+        this.c.addGroup("My group 2", {
+            sources: ["fixtures/bar.js"]
+        }, this.rootPath);
 
-        this.c.resolveGroups(function (err) {
+        this.c.resolveGroups(done(function (err) {
             refute.defined(err);
             // If it is resolved, it has a resourceSet.
-            assert("resourceSet" in this.c.groups[0]);
-            assert("resourceSet" in this.c.groups[1]);
-            done();
-        }.bind(this));
+            assert.defined(this.c.groups[0].resourceSet);
+            assert.defined(this.c.groups[1].resourceSet);
+        }.bind(this)));
     },
 
     "resolves with groups": function (done) {
-        this.c.addGroup("My group 1", {sources: ["fixtures/foo.js"]}, this.rootPath);
-        this.c.addGroup("My group 2", {sources: ["fixtures/bar.js"]}, this.rootPath);
+        this.c.addGroup("My group 1", {
+            sources: ["fixtures/foo.js"]
+        }, this.rootPath);
+        this.c.addGroup("My group 2", {
+            sources: ["fixtures/bar.js"]
+        }, this.rootPath);
 
         this.c.resolveGroups(done(function (err, groups) {
             assert.equals(groups, this.c.groups);
@@ -95,11 +104,10 @@ buster.testCase("buster-configuration", {
             rootPath: __dirname + "/.."
         });
 
-        this.c.resolveGroups(function (err) {
+        this.c.resolveGroups(done(function (err) {
             refute.defined(err);
-            assert("resourceSet" in this.c.groups[0]);
-            done();
-        }.bind(this));
+            assert.defined(this.c.groups[0].resourceSet);
+        }.bind(this)));
     },
 
     "resolves custom root path relative to file root path": function (done) {
@@ -108,11 +116,10 @@ buster.testCase("buster-configuration", {
             rootPath: ".."
         }, __dirname);
 
-        this.c.resolveGroups(function (err) {
+        this.c.resolveGroups(done(function (err) {
             refute.defined(err);
-            assert("resourceSet" in this.c.groups[0]);
-            done();
-        }.bind(this));
+            assert.defined(this.c.groups[0].resourceSet);
+        }.bind(this)));
     },
 
     "creates extended group": function (done) {
@@ -121,15 +128,15 @@ buster.testCase("buster-configuration", {
         }, __dirname);
 
         var group = this.c.addGroup("My group 2", {
-            extends: "My group 1",
-            autoRun: true
+            "extends": "My group 1",
+            "autoRun": true
         });
 
-        this.c.resolveGroups(function (err) {
-            assert.equals(group.resourceSet.loadPath.paths(), ["/fixtures/foo.js"]);
+        this.c.resolveGroups(done(function (err) {
+            assert.equals(group.resourceSet.loadPath.paths(),
+                          ["/fixtures/foo.js"]);
             assert(group.options.autoRun);
-            done();
-        }.bind(this));
+        }.bind(this)));
     },
 
     "complains about unknown property": function (done) {
@@ -137,11 +144,11 @@ buster.testCase("buster-configuration", {
             load: ["fixtures/foo.js"]
         }, __dirname);
 
-        this.c.resolveGroups(function (err) {
+        this.c.resolveGroups(done(function (err) {
             assert.match(err, "Unknown configuration option 'load'");
-            assert.match(err, "Did you mean one of: deps, libs, src, sources, testLibs, tests, specLibs, specs?");
-            done();
-        }.bind(this));
+            assert.match(err, "Did you mean one of: deps, libs, src, " +
+                         "sources, testLibs, tests, specLibs, specs?");
+        }.bind(this)));
     },
 
     "load events": {
