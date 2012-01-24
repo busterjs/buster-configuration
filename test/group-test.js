@@ -306,11 +306,11 @@ buster.testCase("configuration group", {
 
         "adds bundle groups": function (done) {
             this.group.setupFrameworkResources().then(done(function (rs) {
-                var bundleResourceName = "/buster/bundle-0.2.1.js";
+                var bundleResourceName = "/buster/bundle-0.3.0.js";
                 var bundleResource = rs.get(bundleResourceName);
                 assert.defined(bundleResource);
 
-                var compatResourceName = "/buster/compat-0.2.1.js";
+                var compatResourceName = "/buster/compat-0.3.0.js";
                 var compatResource = rs.get(compatResourceName);
                 assert.defined(compatResource);
 
