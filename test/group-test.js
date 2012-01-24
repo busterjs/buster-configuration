@@ -9,7 +9,7 @@ function assertContainsResources(group, resources, done) {
         resources.forEach(function (path) {
             assert.isObject(resourceSet.get(path));
         });
-        done()
+        done();
     });
 }
 
@@ -19,7 +19,7 @@ function assertResource(group, path, content, done) {
         assert.defined(resource);
         resource.content().then(function (actual) {
             assert.equals(actual, content);
-            done()
+            done();
         }, done);
     });
 }
