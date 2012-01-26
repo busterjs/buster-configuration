@@ -533,9 +533,8 @@ buster.testCase("configuration group", {
     "extensions": {
         setUp: function () {
             this.configure = this.spy();
-            this.stub(moduleLoader, "load").returns({
-                configure: this.configure
-            });
+            this.module = { configure: this.configure };
+            this.stub(moduleLoader, "load").returns(this.module);
         },
 
         "loads modules with buster-module-loader": function (done) {
@@ -566,6 +565,18 @@ buster.testCase("configuration group", {
 
             group.resolve().then(done(function () {
                 assert.calledOnceWith(this.configure, group);
+            }.bind(this)));
+        },
+
+        "calls configure on extension with custom config": function (done) {
+            var config = { yeah: "Awright!" };
+            var group = bcGroup.create({
+                extensions: ["baluba"],
+                baluba: config
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(done(function () {
+                assert.calledOnceWith(this.configure, group, config);
             }.bind(this)));
         },
 
