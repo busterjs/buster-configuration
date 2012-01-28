@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "buster-core": ">=0.5.1",
-        "when": ">=0.10",
+        "when": "https://github.com/cujojs/when/tarball/v0.11.1",
         "buster-resources": ">=0.2",
         "buster-module-loader": "~0.3",
         "buster-evented-logger": "~0.4",
