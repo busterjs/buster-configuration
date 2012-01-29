@@ -303,25 +303,18 @@ buster.testCase("configuration group", {
         assertLoad(group, ["/foo.js", "/bar.js"], done);
     },
 
-    "framework resources": {
-        setUp: function (done) {
+    "buster framework": {
+        setUp: function () {
             this.group = bcGroup.create({}, __dirname + "/fixtures");
-            this.group.resolve().then(done(function () {
-                this.resourceSet = this.group.resourceSet;
-            }.bind(this)));
         },
 
         "adds bundle groups": function (done) {
-            this.group.setupFrameworkResources().then(done(function (rs) {
-                var bundleResourceName = "/buster/bundle-0.3.0.js";
-                var bundleResource = rs.get(bundleResourceName);
-                assert.defined(bundleResource);
+            this.group.bundleFramework().resolve().then(done(function (rs) {
+                assert.isObject(rs.get("/buster/bundle-0.3.0.js"));
+                assert.isObject(rs.get("/buster/compat-0.3.0.js"));
 
-                var compatResourceName = "/buster/compat-0.3.0.js";
-                var compatResource = rs.get(compatResourceName);
-                assert.defined(compatResource);
-
-                assert.equals([bundleResourceName, compatResourceName],
+                assert.equals(["/buster/bundle-0.3.0.js",
+                               "/buster/compat-0.3.0.js"],
                               rs.loadPath.paths().slice(0, 2));
             }), done(function (err) {
                 buster.log(err.stack || err);
@@ -336,12 +329,38 @@ buster.testCase("configuration group", {
                 });
             });
 
-            this.group.setupFrameworkResources().then(function (rs) {
+            this.group.bundleFramework().resolve().then(function (rs) {
                 assert.defined(rs.get("/stuff"));
                 rs.get("/stuff").content().then(done(function (content) {
                     assert.equals(content, "Oh yeah!");
                 }));
             });
+        }
+    },
+
+    "load:resources": {
+        "fires when everything is loaded": function (done) {
+            var group = bcGroup.create({
+                sources: ["foo.js"]
+            }, __dirname + "/fixtures");
+
+            group.on("load:framework", function (resourceSet) {
+                resourceSet.addResource({
+                    path: "/stuff",
+                    content: "Oh yeah!"
+                });
+            });
+
+            group.on("load:resources", function (resourceSet) {
+                resourceSet.addResource("bar.js");
+            });
+
+            group.bundleFramework();
+            group.resolve().then(done(function (resourceSet) {
+                assert.isObject(resourceSet.get("/foo.js"));
+                assert.isObject(resourceSet.get("/bar.js"));
+                assert.isObject(resourceSet.get("/stuff"));
+            }));
         }
     },
 
