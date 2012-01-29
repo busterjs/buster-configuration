@@ -335,6 +335,19 @@ buster.testCase("configuration group", {
                     assert.equals(content, "Oh yeah!");
                 }));
             });
+        },
+
+        "loads framework before other groups": function (done) {
+            var group = bcGroup.create({
+                tests: ["foo.js"]
+            }, __dirname + "/fixtures");
+
+            group.bundleFramework().resolve().then(done(function (rs) {
+                assert.equals(rs.loadPath.paths(),
+                              ["/buster/bundle-0.3.0.js",
+                               "/buster/compat-0.3.0.js",
+                               "/foo.js"]);
+            }));
         }
     },
 
