@@ -329,7 +329,7 @@ buster.testCase("configuration group", {
         },
 
         "allows extension with events": function (done) {
-            this.group.on("load:resources", function (resourceSet) {
+            this.group.on("load:framework", function (resourceSet) {
                 resourceSet.addResource({
                     path: "/stuff",
                     content: "Oh yeah!"
