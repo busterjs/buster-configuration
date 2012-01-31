@@ -564,8 +564,8 @@ buster.testCase("configuration group", {
 
     "extensions": {
         setUp: function () {
-            this.configure = this.spy();
-            this.module = { configure: this.configure };
+            this.create = this.stub().returns({});
+            this.module = { create: this.create };
             this.stub(moduleLoader, "load").returns(this.module);
         },
 
@@ -590,17 +590,17 @@ buster.testCase("configuration group", {
             }));
         },
 
-        "calls configure on extensions": function (done) {
+        "calls create on extensions": function (done) {
             var group = bcGroup.create({
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
-                assert.calledOnceWith(this.configure, group);
+                assert.calledOnceWith(this.create);
             }.bind(this)));
         },
 
-        "calls configure on extension with custom config": function (done) {
+        "calls create on extension with custom config": function (done) {
             var config = { yeah: "Awright!" };
             var group = bcGroup.create({
                 extensions: ["baluba"],
@@ -608,7 +608,7 @@ buster.testCase("configuration group", {
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
-                assert.calledOnceWith(this.configure, group, config);
+                assert.calledOnceWith(this.create, config);
             }.bind(this)));
         },
 
@@ -628,18 +628,61 @@ buster.testCase("configuration group", {
             }.bind(this)));
         },
 
-        "fails gracefully when no configure method": function (done) {
-            moduleLoader.load.returns({});
+        "does not fail if extension has no create method": function (done) {
+            var extension = {};
+            moduleLoader.load.returns(extension);
 
             var group = bcGroup.create({
                 extensions: ["baluba"]
             }, __dirname + "/fixtures");
 
-            group.resolve().then(function () {}, done(function (e) {
-                assert.match(e.message, "Failed loading extensions");
-                assert.match(e.message,
-                             "Extension 'baluba' has no 'configure' method");
-            }.bind(this)));
+            group.resolve().then(done(function () {
+                assert(true);
+            }), done);
+        },
+
+        "calls configure on extension": function (done) {
+            var configure = this.spy();
+            moduleLoader.load.returns({ configure: configure });
+
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(done(function () {
+                assert.calledOnceWith(configure, group);
+            }));
+        },
+
+        "calls hook on all extensions": function (done) {
+            var hooks = [this.spy(), this.spy()];
+            moduleLoader.load.returns({ myevent: hooks[0] });
+            moduleLoader.load.withArgs("other").returns({ myevent: hooks[1] });
+
+            var group = bcGroup.create({
+                extensions: ["baluba", "other"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(done(function () {
+                group.runExtensionHook("myevent", 1, 4, 2);
+                assert.calledOnceWith(hooks[0], 1, 4, 2);
+                assert.calledOnceWith(hooks[1], 1, 4, 2);
+            }));
+        },
+
+        "skips hook on extensions with no corresponding method": function (done) {
+            moduleLoader.load.returns({ myevent: this.spy() });
+            moduleLoader.load.withArgs("other").returns({});
+
+            var group = bcGroup.create({
+                extensions: ["baluba", "other"]
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(done(function () {
+                refute.exception(function () {
+                    group.runExtensionHook("myevent", 1, 4, 2);
+                });
+            }));
         }
     },
 
