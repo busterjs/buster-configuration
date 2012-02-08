@@ -579,6 +579,16 @@ buster.testCase("configuration group", {
             }));
         },
 
+        "loads object extension": function (done) {
+            var group = bcGroup.create({});
+            group.extensions.push({});
+
+            group.resolve().then(done(function () {
+                refute.called(moduleLoader.load);
+                assert.equals(group.extensions.length, 1);
+            }));
+        },
+
         "loads all extensions": function (done) {
             var group = bcGroup.create({
                 extensions: ["baluba", "swan"]
