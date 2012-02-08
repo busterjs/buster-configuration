@@ -610,6 +610,21 @@ buster.testCase("configuration group", {
             }.bind(this)));
         },
 
+        "calls create on object extension": function (done) {
+            var create = this.stub().returns({});
+            var group = bcGroup.create({
+                extensions: [{
+                    name: "duda",
+                    extension: { create: create }
+                }],
+                duda: { id: 42 }
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(done(function () {
+                assert.calledOnceWith(create, { id: 42 });
+            }.bind(this)));
+        },
+
         "calls create on extension with custom config": function (done) {
             var config = { yeah: "Awright!" };
             var group = bcGroup.create({
