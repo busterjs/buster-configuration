@@ -708,6 +708,36 @@ buster.testCase("configuration group", {
                     group.runExtensionHook("myevent", 1, 4, 2);
                 });
             }));
+        },
+
+        "runs extension hook before resolving": function () {
+            var hook = this.spy();
+            moduleLoader.load.returns({ myevent: hook });
+
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.runExtensionHook("myevent", { id: 42 });
+            assert.calledOnceWith(hook, { id: 42 });
+        },
+
+        "runs extension hook before and after resolving": function (done) {
+            var hook = this.spy();
+            moduleLoader.load.returns({ myevent: hook });
+
+            var group = bcGroup.create({
+                extensions: ["baluba"]
+            }, __dirname + "/fixtures");
+
+            group.runExtensionHook("myevent", { id: 42 });
+            group.extensions.push("another");
+
+            group.resolve().then(done(function () {
+                group.runExtensionHook("myevent", { id: 73 });
+                assert.calledThrice(hook);
+                assert.calledWith(hook, { id: 73 });
+            }));
         }
     },
 
