@@ -2,7 +2,6 @@ var buster = require("buster");
 var assert = buster.assert;
 var refute = buster.refute;
 var bcGroup = require("../lib/group");
-var moduleLoader = require("buster-module-loader");
 var fs = require("fs");
 
 function assertContainsResources(group, resources, done) {
@@ -567,17 +566,6 @@ buster.testCase("configuration group", {
         setUp: function () {
             this.create = this.stub().returns({});
             this.module = { create: this.create };
-            this.stub(moduleLoader, "load").returns(this.module);
-        },
-
-        "loads modules with buster-module-loader": function (done) {
-            var group = bcGroup.create({
-                extensions: ["baluba"]
-            }, __dirname + "/fixtures");
-
-            group.resolve().then(done(function () {
-                assert.calledOnceWith(moduleLoader.load, "baluba");
-            }));
         },
 
         "loads object extension": function (done) {
@@ -585,25 +573,23 @@ buster.testCase("configuration group", {
             group.extensions.push({});
 
             group.resolve().then(done(function () {
-                refute.called(moduleLoader.load);
                 assert.equals(group.extensions.length, 1);
             }));
         },
 
         "loads all extensions": function (done) {
             var group = bcGroup.create({
-                extensions: ["baluba", "swan"]
+                extensions: [{ name: "baluba" }, { name: "swan" }]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
-                assert.calledWith(moduleLoader.load, "baluba");
-                assert.calledWith(moduleLoader.load, "swan");
+                assert.equals(group.extensions.length, 2);
             }));
         },
 
         "calls create on extensions": function (done) {
             var group = bcGroup.create({
-                extensions: ["baluba"]
+                extensions: [this.module]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
@@ -611,12 +597,23 @@ buster.testCase("configuration group", {
             }.bind(this)));
         },
 
-        "calls create on object extension": function (done) {
+        "fails gracefully if extensions is not array": function (done) {
+            var group = bcGroup.create({
+                extensions: this.module
+            }, __dirname + "/fixtures");
+
+            group.resolve().then(function () {}, done(function (err) {
+                assert.match(err,
+                             "`extensions' should be an array of extensions");
+            }.bind(this)));
+        },
+
+        "configures object extension by name": function (done) {
             var create = this.stub().returns({});
             var group = bcGroup.create({
                 extensions: [{
                     name: "duda",
-                    extension: { create: create }
+                    create: create
                 }],
                 duda: { id: 42 }
             }, __dirname + "/fixtures");
@@ -626,40 +623,9 @@ buster.testCase("configuration group", {
             }.bind(this)));
         },
 
-        "calls create on extension with custom config": function (done) {
-            var config = { yeah: "Awright!" };
-            var group = bcGroup.create({
-                extensions: ["baluba"],
-                baluba: config
-            }, __dirname + "/fixtures");
-
-            group.resolve().then(done(function () {
-                assert.calledOnceWith(this.create, config);
-            }.bind(this)));
-        },
-
-        "fails gracefully if extension cannot be found": function (done) {
-            moduleLoader.load.throws({
-                name: "Error",
-                message: "Cannot find module 'baluba'"
-            });
-
-            var group = bcGroup.create({
-                extensions: ["baluba"]
-            }, __dirname + "/fixtures");
-
-            group.resolve().then(function () {}, done(function (e) {
-                assert.match(e.message, "Failed loading extensions");
-                assert.match(e.message, "Cannot find module 'baluba'");
-            }.bind(this)));
-        },
-
         "does not fail if extension has no create method": function (done) {
-            var extension = {};
-            moduleLoader.load.returns(extension);
-
             var group = bcGroup.create({
-                extensions: ["baluba"]
+                extensions: [{}]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
@@ -669,10 +635,9 @@ buster.testCase("configuration group", {
 
         "calls configure on extension": function (done) {
             var configure = this.spy();
-            moduleLoader.load.returns({ configure: configure });
 
             var group = bcGroup.create({
-                extensions: ["baluba"]
+                extensions: [{ configure: configure }]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
@@ -682,11 +647,9 @@ buster.testCase("configuration group", {
 
         "calls hook on all extensions": function (done) {
             var hooks = [this.spy(), this.spy()];
-            moduleLoader.load.returns({ myevent: hooks[0] });
-            moduleLoader.load.withArgs("other").returns({ myevent: hooks[1] });
 
             var group = bcGroup.create({
-                extensions: ["baluba", "other"]
+                extensions: [{ myevent: hooks[0] }, { myevent: hooks[1] }]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
@@ -697,11 +660,8 @@ buster.testCase("configuration group", {
         },
 
         "skips hook on extensions with no corresponding method": function (done) {
-            moduleLoader.load.returns({ myevent: this.spy() });
-            moduleLoader.load.withArgs("other").returns({});
-
             var group = bcGroup.create({
-                extensions: ["baluba", "other"]
+                extensions: [{ myevent: this.spy() }, {}]
             }, __dirname + "/fixtures");
 
             group.resolve().then(done(function () {
@@ -713,10 +673,9 @@ buster.testCase("configuration group", {
 
         "runs extension hook before resolving": function () {
             var hook = this.spy();
-            moduleLoader.load.returns({ myevent: hook });
 
             var group = bcGroup.create({
-                extensions: ["baluba"]
+                extensions: [{ myevent: hook }]
             }, __dirname + "/fixtures");
 
             group.runExtensionHook("myevent", { id: 42 });
@@ -725,14 +684,13 @@ buster.testCase("configuration group", {
 
         "runs extension hook before and after resolving": function (done) {
             var hook = this.spy();
-            moduleLoader.load.returns({ myevent: hook });
 
             var group = bcGroup.create({
-                extensions: ["baluba"]
+                extensions: [{ myevent: hook }]
             }, __dirname + "/fixtures");
 
             group.runExtensionHook("myevent", { id: 42 });
-            group.extensions.push("another");
+            group.extensions.push({ myevent: hook });
 
             group.resolve().then(done(function () {
                 group.runExtensionHook("myevent", { id: 73 });
