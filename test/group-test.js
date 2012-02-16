@@ -604,7 +604,7 @@ buster.testCase("configuration group", {
 
             group.resolve().then(function () {}, done(function (err) {
                 assert.match(err,
-                             "`extensions' should be an array of extensions");
+                             "`extensions' should be an array");
             }.bind(this)));
         },
 
