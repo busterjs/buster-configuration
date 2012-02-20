@@ -1,6 +1,6 @@
 {
     "name": "buster-configuration",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Implements the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
@@ -28,7 +28,7 @@
         "buster-bayeux-emitter": ">=0.1",
         "sinon": ">=1.3",
         "sinon-buster": ">=0.4.1",
-        "buster-test": ">=0.4"
+        "buster-test": ">=0.4.1"
     },
     "devDependencies": {
         "buster": "*",
