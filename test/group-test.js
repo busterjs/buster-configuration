@@ -190,7 +190,7 @@ buster.testCase("configuration group", {
 
     "loads tests and testHelpers in right order": function (done) {
         var group = bcGroup.create({
-            testLibs: ["test/*.js"],
+            testHelpers: ["test/*.js"],
             tests: ["b*r.js"]
         }, __dirname + "/fixtures");
 
@@ -223,8 +223,8 @@ buster.testCase("configuration group", {
 
     "loads test libs and spec libs in right order": function (done) {
         var group = bcGroup.create({
-            specLibs: ["fo*.js"],
-            testLibs: ["b*r.js"]
+            specHelpers: ["fo*.js"],
+            testHelpers: ["b*r.js"]
         }, __dirname + "/fixtures");
 
         assertLoad(group, ["/foo.js", "/bar.js"], done);
