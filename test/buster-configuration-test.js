@@ -22,6 +22,11 @@ buster.testCase("buster-configuration", {
         assert.equals(this.c.groups.length, 1);
     },
 
+    "uses explicit file name": function () {
+        this.c.loadFile(__dirname + "/fixtures/dups/file.js");
+        assert.equals(this.c.groups.length, 1);
+    },
+
     "handles non-existing file": function () {
         refute(this.c.loadFile(__dirname + "/does-not-exist"));
         assert.equals(this.c.groups.length, 0);
