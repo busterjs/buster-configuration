@@ -531,6 +531,34 @@ buster.testCase("configuration group", {
             }));
         },
 
+        "includes extensions": function (done) {
+            var create = this.stub().returns({});
+            var original = bcGroup.create({
+                extensions: [{ create: create }]
+            }, __dirname + "/fixtures");
+            var group = original.extend({}, __dirname + "/fixtures");
+
+            original.resolve();
+            group.resolve().then(done(function (resourceSet) {
+                assert.calledTwice(create);
+            }));
+        },
+
+        "includes extensions with custom configuration": function (done) {
+            var create = this.stub().returns({});
+            var original = bcGroup.create({
+                extensions: [{ name: "amd", create: create }],
+                amd: { id: 42 }
+            }, __dirname + "/fixtures");
+            var group = original.extend({}, __dirname + "/fixtures");
+
+            original.resolve();
+            group.resolve().then(done(function (resourceSet) {
+                assert.calledTwice(create);
+                assert.equals(create.args[1][0], { id: 42 });
+            }));
+        },
+
         "inherits server setting": function () {
             var group = this.group.extend({ libs: [] });
             assert.match(group.server, { hostname: "localhost", port: 9191 });
