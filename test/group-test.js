@@ -605,6 +605,16 @@ buster.testCase("configuration group", {
             }));
         },
 
+        "fails for string extension": function (done) {
+            var group = bcGroup.create({
+                extensions: ["buster-lint"]
+            });
+
+            group.resolve().then(done, done(function (err) {
+                assert.match(err.message, "require(\"buster-lint\")");
+            }));
+        },
+
         "loads all extensions": function (done) {
             var group = bcGroup.create({
                 extensions: [{ name: "baluba" }, { name: "swan" }]
