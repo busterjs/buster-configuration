@@ -28,7 +28,7 @@
         "buster-bayeux-emitter": ">=0.1.1",
         "sinon": ">=1.3",
         "sinon-buster": ">=0.5.0",
-        "buster-test": ">=0.5.0"
+        "buster-test": ">=0.5"
     },
     "devDependencies": {
         "buster": "*",
