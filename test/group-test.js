@@ -310,11 +310,11 @@ buster.testCase("configuration group", {
 
         "adds bundle groups": function (done) {
             this.group.bundleFramework().resolve().then(done(function (rs) {
-                assert.isObject(rs.get("/buster/bundle-0.3.1.js"));
-                assert.isObject(rs.get("/buster/compat-0.3.1.js"));
+                assert.isObject(rs.get("/buster/bundle-0.4.1.js"));
+                assert.isObject(rs.get("/buster/compat-0.4.1.js"));
 
-                assert.equals(["/buster/bundle-0.3.1.js",
-                               "/buster/compat-0.3.1.js"],
+                assert.equals(["/buster/bundle-0.4.1.js",
+                               "/buster/compat-0.4.1.js"],
                               rs.loadPath.paths().slice(0, 2));
             }), done(function (err) {
                 buster.log(err.stack || err);
@@ -344,8 +344,8 @@ buster.testCase("configuration group", {
 
             group.bundleFramework().resolve().then(done(function (rs) {
                 assert.equals(rs.loadPath.paths(),
-                              ["/buster/bundle-0.3.1.js",
-                               "/buster/compat-0.3.1.js",
+                              ["/buster/bundle-0.4.1.js",
+                               "/buster/compat-0.4.1.js",
                                "/foo.js"]);
             }));
         }
