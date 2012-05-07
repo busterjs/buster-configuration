@@ -64,69 +64,6 @@ buster.testCase("buster-configuration", {
         }, {name: "test the foo"}]);
     },
 
-    "resolves all groups": function (done) {
-        this.c.addGroup("My group 1", {
-            sources: ["fixtures/foo.js"]
-        }, this.rootPath);
-        this.c.addGroup("My group 2", {
-            sources: ["fixtures/bar.js"]
-        }, this.rootPath);
-
-        this.c.resolveGroups(done(function (err) {
-            refute.defined(err);
-            // If it is resolved, it has a resourceSet.
-            assert.defined(this.c.groups[0].resourceSet);
-            assert.defined(this.c.groups[1].resourceSet);
-        }.bind(this)));
-    },
-
-    "resolves with groups": function (done) {
-        this.c.addGroup("My group 1", {
-            sources: ["fixtures/foo.js"]
-        }, this.rootPath);
-        this.c.addGroup("My group 2", {
-            sources: ["fixtures/bar.js"]
-        }, this.rootPath);
-
-        this.c.resolveGroups(done(function (err, groups) {
-            assert.equals(groups, this.c.groups);
-        }.bind(this)));
-    },
-
-    "resolves all groups with error": function (done) {
-        this.c.addGroup("My group 1", { resources: [{ path: "/bogus" }] });
-        this.c.addGroup("My group 2", { resources: [{ path: "/bogus2" }] });
-
-        this.c.resolveGroups(done(function (err) {
-            assert.defined(err);
-            assert.match(err.message, "must have content");
-        }.bind(this)));
-    },
-
-    "resolves group with custom root path": function (done) {
-        this.c.addGroup("My group 1", {
-            sources: ["test/fixtures/foo.js"],
-            rootPath: __dirname + "/.."
-        });
-
-        this.c.resolveGroups(done(function (err) {
-            refute.defined(err);
-            assert.defined(this.c.groups[0].resourceSet);
-        }.bind(this)));
-    },
-
-    "resolves custom root path relative to file root path": function (done) {
-        this.c.addGroup("My group 1", {
-            sources: ["test/fixtures/foo.js"],
-            rootPath: ".."
-        }, __dirname);
-
-        this.c.resolveGroups(done(function (err) {
-            refute.defined(err);
-            assert.defined(this.c.groups[0].resourceSet);
-        }.bind(this)));
-    },
-
     "creates extended group": function (done) {
         this.c.addGroup("My group 1", {
             sources: ["fixtures/foo.js"]
@@ -137,22 +74,10 @@ buster.testCase("buster-configuration", {
             "autoRun": true
         });
 
-        this.c.resolveGroups(done(function (err) {
+        group.resolve().then(done(function (err) {
             assert.equals(group.resourceSet.loadPath.paths(),
                           ["/fixtures/foo.js"]);
             assert(group.options.autoRun);
-        }.bind(this)));
-    },
-
-    "complains about unknown property": function (done) {
-        this.c.addGroup("My group 1", {
-            load: ["fixtures/foo.js"]
-        }, __dirname);
-
-        this.c.resolveGroups(done(function (err) {
-            assert.match(err, "Unknown configuration option 'load'");
-            assert.match(err, "Did you mean one of: deps, libs, src, " +
-                         "sources, testHelpers, tests, specHelpers, specs?");
         }.bind(this)));
     },
 
