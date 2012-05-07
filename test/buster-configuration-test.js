@@ -9,12 +9,31 @@ buster.testCase("buster-configuration", {
         this.rootPath = __dirname;
     },
 
-    "adds group": function () {
-        this.c.addGroup("My group", {}, this.rootPath);
+    "addGroup": {
+        "adds group": function () {
+            this.c.addGroup("My group", {}, this.rootPath);
 
-        assert.equals(this.c.groups.length, 1);
-        var group = this.c.groups[0];
-        assert.equals(group.name, "My group");
+            assert.equals(this.c.groups.length, 1);
+            var group = this.c.groups[0];
+            assert.equals(group.name, "My group");
+        },
+
+        "creates extended group": function (done) {
+            this.c.addGroup("My group 1", {
+                sources: ["fixtures/foo.js"]
+            }, __dirname);
+
+            var group = this.c.addGroup("My group 2", {
+                "extends": "My group 1",
+                "autoRun": true
+            });
+
+            group.resolve().then(done(function (err) {
+                assert.equals(group.resourceSet.loadPath.paths(),
+                              ["/fixtures/foo.js"]);
+                assert(group.options.autoRun);
+            }.bind(this)));
+        }
     },
 
     "loadFile": {
@@ -34,53 +53,40 @@ buster.testCase("buster-configuration", {
         }
     },
 
-    "filters groups on environment": function () {
-        this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
-        this.c.addGroup("My group 2", {environment: "node"}, this.rootPath);
-        this.c.addGroup("My group 3", {environment: "browser"}, this.rootPath);
+    "filterEnv": {
+        "filters groups on environment": function () {
+            this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
+            this.c.addGroup("My group 2", {environment: "node"}, this.rootPath);
+            this.c.addGroup("My group 3", {environment: "browser"}, this.rootPath);
 
-        this.c.filterEnv("node");
-        assert.equals(this.c.groups.length, 2);
+            this.c.filterEnv("node");
+            assert.equals(this.c.groups.length, 2);
+        },
+
+        "ignores non-string environment filters": function () {
+            this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
+            this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
+
+            this.c.filterEnv(null);
+            this.c.filterEnv({});
+            this.c.filterEnv(1234);
+            this.c.filterEnv([]);
+            assert.equals(this.c.groups.length, 2);
+        }
     },
 
-    "ignores non-string environment filters": function () {
-        this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
-        this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
+    "filterGroup": {
+        "filters groups on name": function () {
+            this.c.addGroup("The test", {}, this.rootPath);
+            this.c.addGroup("test the foo", {}, this.rootPath);
+            this.c.addGroup("foo the bar", {}, this.rootPath);
 
-        this.c.filterEnv(null);
-        this.c.filterEnv({});
-        this.c.filterEnv(1234);
-        this.c.filterEnv([]);
-        assert.equals(this.c.groups.length, 2);
-    },
-
-    "filters groups on name": function () {
-        this.c.addGroup("The test", {}, this.rootPath);
-        this.c.addGroup("test the foo", {}, this.rootPath);
-        this.c.addGroup("foo the bar", {}, this.rootPath);
-
-        this.c.filterGroup(/test/);
-        assert.equals(this.c.groups.length, 2);
-        assert.match(this.c.groups, [{
-            name: "The test"
-        }, {name: "test the foo"}]);
-    },
-
-    "creates extended group": function (done) {
-        this.c.addGroup("My group 1", {
-            sources: ["fixtures/foo.js"]
-        }, __dirname);
-
-        var group = this.c.addGroup("My group 2", {
-            "extends": "My group 1",
-            "autoRun": true
-        });
-
-        group.resolve().then(done(function (err) {
-            assert.equals(group.resourceSet.loadPath.paths(),
-                          ["/fixtures/foo.js"]);
-            assert(group.options.autoRun);
-        }.bind(this)));
+            this.c.filterGroup(/test/);
+            assert.equals(this.c.groups.length, 2);
+            assert.match(this.c.groups, [{
+                name: "The test"
+            }, {name: "test the foo"}]);
+        }
     },
 
     "load events": {
