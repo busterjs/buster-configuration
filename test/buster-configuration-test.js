@@ -54,23 +54,27 @@ buster.testCase("buster-configuration", {
     },
 
     "filterEnv": {
+        setUp: function () {
+            this.node = { environment: "node" };
+            this.browser = { environment: "browser" };
+        },
+
         "filters groups on environment": function () {
-            this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
-            this.c.addGroup("My group 2", {environment: "node"}, this.rootPath);
-            this.c.addGroup("My group 3", {environment: "browser"}, this.rootPath);
+            this.c.addGroup("My group 1", this.node, this.rootPath);
+            this.c.addGroup("My group 2", this.node, this.rootPath);
+            this.c.addGroup("My group 3", this.browser, this.rootPath);
 
             this.c.filterEnv("node");
+
             assert.equals(this.c.groups.length, 2);
         },
 
         "ignores non-string environment filters": function () {
-            this.c.addGroup("My group 1", {environment: "node"}, this.rootPath);
-            this.c.addGroup("My group 2", {environment: "browser"}, this.rootPath);
+            this.c.addGroup("My group 1", this.node, this.rootPath);
+            this.c.addGroup("My group 2", this.browser, this.rootPath);
 
-            this.c.filterEnv(null);
-            this.c.filterEnv({});
-            this.c.filterEnv(1234);
-            this.c.filterEnv([]);
+            this.c.filterEnv(null).filterEnv({}).filterEnv(1234).filterEnv([]);
+
             assert.equals(this.c.groups.length, 2);
         }
     },
@@ -82,6 +86,7 @@ buster.testCase("buster-configuration", {
             this.c.addGroup("foo the bar", {}, this.rootPath);
 
             this.c.filterGroup(/test/);
+
             assert.equals(this.c.groups.length, 2);
             assert.match(this.c.groups, [{
                 name: "The test"
