@@ -17,19 +17,21 @@ buster.testCase("buster-configuration", {
         assert.equals(group.name, "My group");
     },
 
-    "loads groups from config file": function () {
-        assert(this.c.loadFile(__dirname + "/buster"));
-        assert.equals(this.c.groups.length, 1);
-    },
+    "loadFile": {
+        "loads groups from config file": function () {
+            this.c.loadFile(__dirname + "/buster");
+            assert.equals(this.c.groups.length, 1);
+        },
 
-    "uses explicit file name": function () {
-        this.c.loadFile(__dirname + "/fixtures/dups/file.js");
-        assert.equals(this.c.groups.length, 1);
-    },
+        "uses explicit file name": function () {
+            this.c.loadFile(__dirname + "/fixtures/dups/file.js");
+            assert.equals(this.c.groups.length, 1);
+        },
 
-    "handles non-existing file": function () {
-        refute(this.c.loadFile(__dirname + "/does-not-exist"));
-        assert.equals(this.c.groups.length, 0);
+        "handles non-existing file": function () {
+            this.c.loadFile(__dirname + "/does-not-exist");
+            assert.equals(this.c.groups.length, 0);
+        }
     },
 
     "filters groups on environment": function () {
