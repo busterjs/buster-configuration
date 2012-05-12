@@ -47,6 +47,17 @@ buster.testCase("buster-configuration", {
             assert.equals(this.c.groups.length, 1);
         },
 
+        "sets source on groups": function () {
+            process.chdir(__dirname);
+            this.c.loadFile("fixtures/dups/file.js");
+            assert.equals(this.c.groups[0].source, "fixtures/dups/file.js");
+        },
+
+        "sets sources on configuration": function () {
+            this.c.loadFile("fixtures/dups/file.js");
+            assert.equals(this.c.sources, ["fixtures/dups/file.js"]);
+        },
+
         "handles non-existing file": function () {
             this.c.loadFile(__dirname + "/does-not-exist");
             assert.equals(this.c.groups.length, 0);
