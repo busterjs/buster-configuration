@@ -94,7 +94,7 @@ buster.testCase("configuration group", {
         group.resolve().then(function (rs) {
             buster.log("Oops!");
         }, done(function (err) {
-            assert.match(err, "../buster.js");
+            assert.match(err, Path.join("..", "buster.js"));
             assert.match(err, "outside the project root");
             assert.match(err, "set rootPath to the desired root");
         }));
