@@ -3,6 +3,7 @@ var assert = buster.assert;
 var refute = buster.refute;
 var bcGroup = require("../lib/group");
 var fs = require("fs");
+var Path = require("path");
 
 function assertContainsResources(group, resources, done) {
     group.resolve().then(function (resourceSet) {
@@ -761,20 +762,25 @@ buster.testCase("configuration group", {
     },
 
     "tmpfile": {
+        requiresSupportFor: {"*nix": process.platform != "win32"},
         setUp: function () {
             this.group = bcGroup.create({}, "/home/christian/projects/myproject");
-            this.stub(fs, "statSync");
         },
 
-        "returns /tmp pathname when /tmp is available": function () {
-            fs.statSync.returns({ isDirectory: this.stub().returns(true) });
+        "returns pathname": function () {
             assert.equals("/tmp/2f4a2c82aed0d4748c03818f69f2a26c8e49bfff",
                           this.group.tmpFile("buster.cache"));
+        }
+    },
+
+    "tmpfile on windows": {
+        requiresSupportFor: {"windows": process.platform == "win32"},
+        setUp: function () {
+            this.group = bcGroup.create({rootPath: "c:\\Foo\\Bar"});
         },
 
-        "returns dotted path in project when no /tmp": function () {
-            fs.statSync.throws("ENOENT");
-            assert.equals("/home/christian/projects/myproject/.buster.cache",
+        "returns pathname": function () {
+            assert.equals(Path.join(process.env["TEMP"], "2c1b809e8e3ae0dae467a80f19bfe712b67593f8"),
                           this.group.tmpFile("buster.cache"));
         }
     }
