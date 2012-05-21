@@ -759,29 +759,5 @@ buster.testCase("configuration group", {
                 assert.match(err, "Did you mean one of");
             }));
         }
-    },
-
-    "tmpfile": {
-        requiresSupportFor: {"*nix": process.platform != "win32"},
-        setUp: function () {
-            this.group = bcGroup.create({}, "/home/christian/projects/myproject");
-        },
-
-        "returns pathname": function () {
-            assert.equals("/tmp/2f4a2c82aed0d4748c03818f69f2a26c8e49bfff",
-                          this.group.tmpFile("buster.cache"));
-        }
-    },
-
-    "tmpfile on windows": {
-        requiresSupportFor: {"windows": process.platform == "win32"},
-        setUp: function () {
-            this.group = bcGroup.create({rootPath: "c:\\Foo\\Bar"});
-        },
-
-        "returns pathname": function () {
-            assert.equals(Path.join(process.env["TEMP"], "2c1b809e8e3ae0dae467a80f19bfe712b67593f8"),
-                          this.group.tmpFile("buster.cache"));
-        }
     }
 });
