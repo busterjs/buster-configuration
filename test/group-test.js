@@ -731,24 +731,5 @@ buster.testCase("configuration group", {
                 assert.match(err, "Did you mean one of");
             }));
         }
-    },
-
-    "tmpfile": {
-        setUp: function () {
-            this.group = bcGroup.create({}, "/home/christian/projects/myproject");
-            this.stub(fs, "statSync");
-        },
-
-        "returns /tmp pathname when /tmp is available": function () {
-            fs.statSync.returns({ isDirectory: this.stub().returns(true) });
-            assert.equals("/tmp/2f4a2c82aed0d4748c03818f69f2a26c8e49bfff",
-                          this.group.tmpFile("buster.cache"));
-        },
-
-        "returns dotted path in project when no /tmp": function () {
-            fs.statSync.throws("ENOENT");
-            assert.equals("/home/christian/projects/myproject/.buster.cache",
-                          this.group.tmpFile("buster.cache"));
-        }
     }
 });
