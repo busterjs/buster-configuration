@@ -87,7 +87,7 @@ buster.testCase("configuration group", {
 
     "fails for file outside root": function (done) {
         var group = bcGroup.create({
-            resources: ["../*.js"]
+            resources: ["../../*.js"]
         }, __dirname + "/fixtures");
 
         group.resolve().then(function (rs) {
