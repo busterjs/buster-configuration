@@ -1,6 +1,4 @@
 var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
 var busterConfiguration = require("../lib/buster-configuration");
 
 buster.testCase("buster-configuration", {
