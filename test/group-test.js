@@ -304,22 +304,9 @@ buster.testCase("configuration group", {
         assertLoad(group, ["/foo.js", "/bar.js"], done);
     },
 
-    "buster framework": {
+    "framework": {
         setUp: function () {
             this.group = bcGroup.create({}, __dirname + "/fixtures");
-        },
-
-        "adds bundle groups": function (done) {
-            this.group.bundleFramework().resolve().then(done(function (rs) {
-                assert.isObject(rs.get("/buster/bundle-0.4.1.js"));
-                assert.isObject(rs.get("/buster/compat-0.4.1.js"));
-
-                assert.equals(["/buster/bundle-0.4.1.js",
-                               "/buster/compat-0.4.1.js"],
-                              rs.loadPath.paths().slice(0, 2));
-            }), done(function (err) {
-                buster.log(err.stack || err);
-            }));
         },
 
         "allows extension with events": function (done) {
@@ -330,25 +317,12 @@ buster.testCase("configuration group", {
                 });
             });
 
-            this.group.bundleFramework().resolve().then(function (rs) {
+            this.group.resolve().then(function (rs) {
                 assert.defined(rs.get("/stuff"));
                 rs.get("/stuff").content().then(done(function (content) {
                     assert.equals(content, "Oh yeah!");
                 }));
             });
-        },
-
-        "loads framework before other groups": function (done) {
-            var group = bcGroup.create({
-                tests: ["foo.js"]
-            }, __dirname + "/fixtures");
-
-            group.bundleFramework().resolve().then(done(function (rs) {
-                assert.equals(rs.loadPath.paths(),
-                              ["/buster/bundle-0.4.1.js",
-                               "/buster/compat-0.4.1.js",
-                               "/foo.js"]);
-            }));
         }
     },
 
@@ -369,7 +343,6 @@ buster.testCase("configuration group", {
                 resourceSet.addResource("bar.js");
             });
 
-            group.bundleFramework();
             group.resolve().then(done(function (resourceSet) {
                 assert.isObject(resourceSet.get("/foo.js"));
                 assert.isObject(resourceSet.get("/bar.js"));
