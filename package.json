@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "buster-core": ">=0.6.0",
-        "when": "https://github.com/cujojs/when/tarball/1.0.2",
+        "when": "~1.2",
         "buster-resources": ">=0.3",
         "buster-evented-logger": ">=0.4.3",
         "async": "~0.1",
