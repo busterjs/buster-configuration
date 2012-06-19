@@ -709,6 +709,26 @@ buster.testCase("configuration group", {
                 assert.calledThrice(hook);
                 assert.calledWith(hook, { id: 73 });
             }));
+        },
+
+        "runs all extension hooks on same instance": function (done) {
+            var extension = {
+                create: function () { return Object.create(this); },
+                hookA: this.spy(),
+                hookB: this.spy()
+            };
+
+            var group = bcGroup.create({
+                extensions: [extension]
+            }, __dirname + "/fixtures");
+
+            group.runExtensionHook("hookA");
+            group.runExtensionHook("hookB");
+
+            group.resolve().then(done(function () {
+                assert.same(extension.hookA.thisValues[0],
+                            extension.hookB.thisValues[0]);
+            }));
         }
     },
 
