@@ -24,7 +24,7 @@
     "dependencies": {
         "buster-core": ">=0.6.0",
         "when": "~1.2",
-        "buster-resources": ">=0.3",
+        "ramp-resources": ">=0.1",
         "buster-evented-logger": ">=0.4.3",
         "async": "~0.1",
         "glob": "~3.1"
