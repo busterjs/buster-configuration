@@ -1,3 +1,4 @@
+var path = require('path');
 var buster = require("buster");
 var configuration = require("../lib/buster-configuration");
 var fileLoader = require("../lib/file-loader");
@@ -30,9 +31,11 @@ buster.testCase("File loader", {
             buster.log(err, config);
             assert.defined(err);
             assert.match(err.message,
-                         "No file provided, and none of\n" +
-                         "[seaman.js, test/seaman.js, spec/seaman.js]" +
-                         " exist");
+                         "No file provided, and none of\n" + "[" +
+                         path.join("seaman.js") + ", " +
+                         path.join("test", "seaman.js") + ", " +
+                         path.join("spec", "seaman.js") +
+                         "]" + " exist");
         }));
     },
 
