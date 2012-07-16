@@ -2,7 +2,8 @@ var buster = require("buster");
 var rmrf = require("rimraf");
 var path = require("path");
 var fs = require("fs");
-var FIXTURES_ROOT = path.resolve(__dirname, "..", ".fixtures");
+var MODULE_ROOT = path.resolve(__dirname, "..");
+var FIXTURES_ROOT = path.resolve(MODULE_ROOT, ".fixtures");
 
 module.exports = {
     FIXTURES_ROOT: FIXTURES_ROOT,
@@ -51,7 +52,7 @@ module.exports = {
     },
 
     cdFixtures: function () {
-        this.mkdir("");
+        this.mkdir(FIXTURES_ROOT);
         process.chdir(FIXTURES_ROOT);
     },
 
@@ -62,6 +63,7 @@ module.exports = {
                 delete require.cache[mod];
             }
         }
+        process.chdir(MODULE_ROOT);
         rmrf(FIXTURES_ROOT, function (err) {
             if (err) { require("buster").log(err.toString()); }
             done();
