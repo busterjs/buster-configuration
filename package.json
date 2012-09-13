@@ -1,6 +1,6 @@
 {
     "name": "buster-configuration",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "description": "Implements the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
@@ -24,7 +24,7 @@
     "dependencies": {
         "buster-core": ">=0.6.2",
         "when": "https://github.com/cujojs/when/tarball/1.3.0",
-        "ramp-resources": ">=0.4",
+        "ramp-resources": "=0.4.1",
         "buster-evented-logger": ">=0.4.4",
         "async": "~0.1",
         "glob": "~3.1"
