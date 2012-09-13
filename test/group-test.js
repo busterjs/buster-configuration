@@ -674,7 +674,7 @@ buster.testCase("configuration group", {
             }));
         },
 
-        "skips hook on extensions with no corresponding method": function (done) {
+        "skips hook on exts with no corresponding method": function (done) {
             var group = cgroup.create({
                 extensions: [{ myevent: this.spy() }, {}]
             }, __dirname + "/fixtures");

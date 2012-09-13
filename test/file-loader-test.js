@@ -67,7 +67,8 @@ buster.testCase("File loader", {
         },
 
         "loads multiple configuration files": function (done) {
-            this.loader.load(["seaman.js", "seaman2.js"], done(function (err, config) {
+            var files = ["seaman.js", "seaman2.js"];
+            this.loader.load(files, done(function (err, config) {
                 assert.equals(config.groups.length, 4);
             }));
         },
