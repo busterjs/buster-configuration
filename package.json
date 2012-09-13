@@ -1,7 +1,7 @@
 {
     "name": "buster-configuration",
-    "version": "0.5.1",
-    "description": "Implements the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
+    "version": "0.6.0",
+    "description": "Groks the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
         "name": "Christian Johansen",
@@ -12,25 +12,35 @@
         "name": "August Lilleaas",
         "email": "august.lilleaas@gmail.com",
         "url": "http://augustl.com"
+    }, {
+        "name": "Elliot Winkler",
+        "email": "elliot.winkler@gmail.com"
+    }, {
+        "name": "Sam Riley",
+        "email": "samriley@hotmail.co.uk"
+    }, {
+        "name": "Stein Magnus Jodal",
+        "email": "stein.magnus@jodal.no",
+        "url": "http://jodal.no"
     }],
     "main": "./lib/buster-configuration",
     "repository": {
         "type": "git",
-        "url": "git://gitorious.org/buster/buster-configuration.git"
+        "url": "https://github.com/busterjs/buster-configuration.git"
     },
     "scripts": {
         "test": "./node_modules/buster/bin/buster-test"
     },
     "dependencies": {
-        "buster-core": ">=0.6.2",
+        "lodash": "~0.5",
         "when": "https://github.com/cujojs/when/tarball/1.3.0",
-        "ramp-resources": ">=0.4",
-        "buster-evented-logger": ">=0.4.4",
         "async": "~0.1",
-        "glob": "~3.1"
+        "ramp-resources": ">=0.4",
+        "glob": "~3.1",
+        "bane": ">=0.1.0"
     },
     "devDependencies": {
-        "buster": "*",
+        "buster": "0.6.2",
         "rimraf": "~1"
     }
 }
