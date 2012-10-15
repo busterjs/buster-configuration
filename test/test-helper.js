@@ -22,7 +22,8 @@ module.exports = {
                 return buster.assertions.match(stream.toString(), expected);
             },
             assertMessage: "${2}Expected " + name + "\n${0}\nto match\n${1}",
-            refuteMessage: "${2}Expected " + name + "\n${0}\nnot to match\n${1}",
+            refuteMessage: "${2}Expected " + name +
+                "\n${0}\nnot to match\n${1}",
             values: function (expected, message) {
                 return [stream.toString(), expected, message || ""];
             }

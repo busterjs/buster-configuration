@@ -1,9 +1,8 @@
 var buster = require("buster");
-var assert = buster.assert;
-var refute = buster.refute;
-var bcGroup = require("../lib/group");
+var cgroup = require("../lib/group");
 var fs = require("fs");
 var Path = require("path");
+var helper = require("./test-helper");
 
 function assertContainsResources(group, resources, done) {
     group.resolve().then(function (resourceSet) {
@@ -36,8 +35,12 @@ function assertLoad(group, load, done) {
 }
 
 buster.testCase("configuration group", {
+    setUp: function () {
+        helper.cdFixtures();
+    },
+
     "creates resources with root path": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
@@ -45,7 +48,7 @@ buster.testCase("configuration group", {
     },
 
     "gets file contents as actual content": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["foo.js"]
         }, __dirname + "/fixtures");
 
@@ -57,7 +60,7 @@ buster.testCase("configuration group", {
     },
 
     "resolves globs": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["*.js"]
         }, __dirname + "/fixtures");
 
@@ -65,7 +68,7 @@ buster.testCase("configuration group", {
     },
 
     "adds resource as object with path": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{ path: "foo.js", content: "Ok" }]
         }, __dirname + "/fixtures");
 
@@ -73,7 +76,7 @@ buster.testCase("configuration group", {
     },
 
     "respects custom headers": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{
                 path: "foo.js",
                 content: "Ok",
@@ -87,7 +90,7 @@ buster.testCase("configuration group", {
     },
 
     "fails for file outside root": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["../../*.js"]
         }, __dirname + "/fixtures");
 
@@ -101,7 +104,7 @@ buster.testCase("configuration group", {
     },
 
     "adds backend resource": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{ path: "foo", backend: "http://10.0.0.1/" }]
         });
 
@@ -111,7 +114,7 @@ buster.testCase("configuration group", {
     },
 
     "adds combined resources": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["foo.js", "bar.js",
                         { path: "/bundle.js", combine: ["/foo.js", "/bar.js"] }]
         }, __dirname + "/fixtures");
@@ -121,7 +124,7 @@ buster.testCase("configuration group", {
     },
 
     "adds resources with content for non-existent file": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{
                 path: "/does-not-exist.txt",
                 content: "Hello, World"
@@ -132,7 +135,7 @@ buster.testCase("configuration group", {
     },
 
     "adds resources with content for file that exists": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{ path: "/foo.js", content: "Hello, World" }]
         }, __dirname + "/fixtures");
 
@@ -140,7 +143,7 @@ buster.testCase("configuration group", {
     },
 
     "loads resource as source": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: ["foo.js"],
             sources: ["foo.js"]
         }, __dirname + "/fixtures");
@@ -149,7 +152,7 @@ buster.testCase("configuration group", {
     },
 
     "adds sourcees to load and add them as file resources": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
@@ -159,7 +162,7 @@ buster.testCase("configuration group", {
     },
 
     "creates group without file system access": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             resources: [{ path: "/hey", content: "// OK" }],
             sources: ["/hey"]
         });
@@ -168,7 +171,7 @@ buster.testCase("configuration group", {
     },
 
     "adds source files via glob pattern": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             sources: ["*.js"]
         }, __dirname + "/fixtures");
 
@@ -176,7 +179,7 @@ buster.testCase("configuration group", {
     },
 
     "libs, sources and tests in right order with globbing": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             libs: ["fo*.js"],
             sources: ["b*r.js"],
             tests: ["test/*.js"]
@@ -190,7 +193,7 @@ buster.testCase("configuration group", {
     },
 
     "loads tests and testHelpers in right order": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             testHelpers: ["test/*.js"],
             tests: ["b*r.js"]
         }, __dirname + "/fixtures");
@@ -203,7 +206,7 @@ buster.testCase("configuration group", {
     },
 
     "loads deps, sources and specs in right order": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             deps: ["fo*.js"],
             src: ["b*r.js"],
             specs: ["test/*.js"]
@@ -213,7 +216,7 @@ buster.testCase("configuration group", {
     },
 
     "loads libs, deps and sources in right order": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             deps: ["fo*.js"],
             libs: ["b*r.js"],
             sources: ["test/*.js"]
@@ -223,7 +226,7 @@ buster.testCase("configuration group", {
     },
 
     "loads test libs and spec libs in right order": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             specHelpers: ["fo*.js"],
             testHelpers: ["b*r.js"]
         }, __dirname + "/fixtures");
@@ -232,7 +235,7 @@ buster.testCase("configuration group", {
     },
 
     "loads libs, src and sources in right order": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             libs: ["ba*.js"],
             src: ["f*.js"],
             sources: ["test/*.js"]
@@ -243,7 +246,7 @@ buster.testCase("configuration group", {
 
     "server address": {
         "is parsed": function () {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 server: "http://localhost:1234/buster"
             }, __dirname + "/fixtures");
 
@@ -255,7 +258,7 @@ buster.testCase("configuration group", {
         },
 
         "is parsed without path": function () {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 server: "http://localhost:1234"
             }, __dirname + "/fixtures");
 
@@ -269,35 +272,35 @@ buster.testCase("configuration group", {
 
     "environments": {
         "is set": function () {
-            var group = bcGroup.create({ environment: "node" });
+            var group = cgroup.create({ environment: "node" });
             assert.equals(group.environment, "node");
         },
 
         "defaults to browser": function () {
-            var group = bcGroup.create({});
+            var group = cgroup.create({});
             assert.equals(group.environment, "browser");
         },
 
         "is set via env shorthand": function () {
-            var group = bcGroup.create({ env: "node" });
+            var group = cgroup.create({ env: "node" });
             assert.equals(group.environment, "node");
         }
     },
 
     "autoRun": {
         "is set": function () {
-            var group = bcGroup.create({ autoRun: true });
+            var group = cgroup.create({ autoRun: true });
             assert.equals(group.options.autoRun, true);
         },
 
         "is not set by default": function () {
-            var group = bcGroup.create({});
+            var group = cgroup.create({});
             refute.defined(group.options.autoRun);
         }
     },
 
     "supports duplicate items in sources for ordering": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             sources: ["foo.js", "foo.js", "*.js"]
         }, __dirname + "/fixtures");
 
@@ -306,7 +309,7 @@ buster.testCase("configuration group", {
 
     "framework": {
         setUp: function () {
-            this.group = bcGroup.create({}, __dirname + "/fixtures");
+            this.group = cgroup.create({}, __dirname + "/fixtures");
         },
 
         "allows extension with events": function (done) {
@@ -328,7 +331,7 @@ buster.testCase("configuration group", {
 
     "load:resources": {
         "fires when everything is loaded": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 sources: ["foo.js"]
             }, __dirname + "/fixtures");
 
@@ -352,7 +355,7 @@ buster.testCase("configuration group", {
     },
 
     "does not resolve multiple times": function (done) {
-        var group = bcGroup.create({
+        var group = cgroup.create({
             libs: ["foo.js"]
         }, __dirname + "/fixtures");
 
@@ -365,7 +368,7 @@ buster.testCase("configuration group", {
 
     "resource load hooks": {
         "can override dependencies": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 deps: ["foo.js"]
             }, __dirname + "/fixtures");
 
@@ -377,7 +380,7 @@ buster.testCase("configuration group", {
         },
 
         "triggers with resolved glob patterns": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 deps: ["*.js"]
             }, __dirname + "/fixtures");
 
@@ -393,7 +396,7 @@ buster.testCase("configuration group", {
         },
 
         "fires dependencies only once for libs/deps": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 deps: ["foo.js"],
                 libs: ["bar.js"]
             }, __dirname + "/fixtures");
@@ -409,7 +412,7 @@ buster.testCase("configuration group", {
         },
 
         "fires sources once for src/sources": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 src: ["foo.js"],
                 sources: ["bar.js"]
             }, __dirname + "/fixtures");
@@ -426,7 +429,7 @@ buster.testCase("configuration group", {
         },
 
         "fires tests once for specs/tests": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 tests: ["foo.js"],
                 specs: ["bar.js"]
             }, __dirname + "/fixtures");
@@ -443,7 +446,7 @@ buster.testCase("configuration group", {
 
     "extended configuration": {
         setUp: function () {
-            this.group = bcGroup.create({
+            this.group = cgroup.create({
                 libs: ["foo.js"],
                 server: "localhost:9191",
                 autoRun: true
@@ -507,7 +510,7 @@ buster.testCase("configuration group", {
 
         "includes extensions": function (done) {
             var create = this.stub().returns({});
-            var original = bcGroup.create({
+            var original = cgroup.create({
                 extensions: [{ create: create }]
             }, __dirname + "/fixtures");
             var group = original.extend({}, __dirname + "/fixtures");
@@ -520,7 +523,7 @@ buster.testCase("configuration group", {
 
         "includes extensions with custom configuration": function (done) {
             var create = this.stub().returns({});
-            var original = bcGroup.create({
+            var original = cgroup.create({
                 extensions: [{ name: "amd", create: create }],
                 amd: { id: 42 }
             }, __dirname + "/fixtures");
@@ -571,7 +574,7 @@ buster.testCase("configuration group", {
         },
 
         "loads object extension": function (done) {
-            var group = bcGroup.create({});
+            var group = cgroup.create({});
             group.extensions.push({});
 
             group.resolve().then(done(function () {
@@ -580,7 +583,7 @@ buster.testCase("configuration group", {
         },
 
         "fails for string extension": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: ["buster-lint"]
             });
 
@@ -590,7 +593,7 @@ buster.testCase("configuration group", {
         },
 
         "loads all extensions": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{ name: "baluba" }, { name: "swan" }]
             }, __dirname + "/fixtures");
 
@@ -600,7 +603,7 @@ buster.testCase("configuration group", {
         },
 
         "calls create on extensions": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [this.module]
             }, __dirname + "/fixtures");
 
@@ -610,7 +613,7 @@ buster.testCase("configuration group", {
         },
 
         "fails gracefully if extensions is not array": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: this.module
             }, __dirname + "/fixtures");
 
@@ -622,7 +625,7 @@ buster.testCase("configuration group", {
 
         "configures object extension by name": function (done) {
             var create = this.stub().returns({});
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{
                     name: "duda",
                     create: create
@@ -636,7 +639,7 @@ buster.testCase("configuration group", {
         },
 
         "does not fail if extension has no create method": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{}]
             }, __dirname + "/fixtures");
 
@@ -648,7 +651,7 @@ buster.testCase("configuration group", {
         "calls configure on extension": function (done) {
             var configure = this.spy();
 
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{ configure: configure }]
             }, __dirname + "/fixtures");
 
@@ -660,7 +663,7 @@ buster.testCase("configuration group", {
         "calls hook on all extensions": function (done) {
             var hooks = [this.spy(), this.spy()];
 
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{ myevent: hooks[0] }, { myevent: hooks[1] }]
             }, __dirname + "/fixtures");
 
@@ -671,8 +674,8 @@ buster.testCase("configuration group", {
             }));
         },
 
-        "skips hook on extensions with no corresponding method": function (done) {
-            var group = bcGroup.create({
+        "skips hook on exts with no corresponding method": function (done) {
+            var group = cgroup.create({
                 extensions: [{ myevent: this.spy() }, {}]
             }, __dirname + "/fixtures");
 
@@ -686,7 +689,7 @@ buster.testCase("configuration group", {
         "runs extension hook before resolving": function () {
             var hook = this.spy();
 
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{ myevent: hook }]
             }, __dirname + "/fixtures");
 
@@ -697,7 +700,7 @@ buster.testCase("configuration group", {
         "runs extension hook before and after resolving": function (done) {
             var hook = this.spy();
 
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [{ myevent: hook }]
             }, __dirname + "/fixtures");
 
@@ -718,7 +721,7 @@ buster.testCase("configuration group", {
                 hookB: this.spy()
             };
 
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 extensions: [extension]
             }, __dirname + "/fixtures");
 
@@ -734,7 +737,7 @@ buster.testCase("configuration group", {
 
     "unknown options": {
         "cause an error": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 thingie: "Oh noes"
             });
 
@@ -744,7 +747,7 @@ buster.testCase("configuration group", {
         },
 
         "include custom message": function (done) {
-            var group = bcGroup.create({
+            var group = cgroup.create({
                 load: [""]
             });
 

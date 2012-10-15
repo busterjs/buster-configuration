@@ -1,13 +1,13 @@
-var path = require('path');
+var path = require("path");
 var buster = require("buster");
-var configuration = require("../lib/buster-configuration");
+var bc = require("../lib/buster-configuration");
 var fileLoader = require("../lib/file-loader");
 var helper = require("./test-helper");
 
 buster.testCase("File loader", {
     setUp: function () {
         helper.cdFixtures();
-        this.loader = fileLoader.create(configuration.create(), "seaman");
+        this.loader = fileLoader.create(bc.createConfiguration(), "seaman");
     },
 
     tearDown: helper.clearFixtures,
@@ -67,7 +67,8 @@ buster.testCase("File loader", {
         },
 
         "loads multiple configuration files": function (done) {
-            this.loader.load(["seaman.js", "seaman2.js"], done(function (err, config) {
+            var files = ["seaman.js", "seaman2.js"];
+            this.loader.load(files, done(function (err, config) {
                 assert.equals(config.groups.length, 4);
             }));
         },

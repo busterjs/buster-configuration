@@ -1,9 +1,11 @@
 var buster = require("buster");
-var busterConfiguration = require("../lib/buster-configuration");
+var bc = require("../lib/buster-configuration");
+var helper = require("./test-helper");
 
 buster.testCase("buster-configuration", {
     setUp: function () {
-        this.c = busterConfiguration.create();
+        helper.cdFixtures();
+        this.c = bc.createConfiguration();
         this.rootPath = __dirname;
     },
 
@@ -38,6 +40,11 @@ buster.testCase("buster-configuration", {
         "loads groups from config file": function () {
             this.c.loadFile(__dirname + "/../buster");
             assert.equals(this.c.groups.length, 1);
+        },
+
+        "loads config from config file": function () {
+            var config = bc.loadConfigurationFile(__dirname + "/../buster");
+            assert.equals(config.groups.length, 1);
         },
 
         "uses explicit file name": function () {
