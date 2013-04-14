@@ -1,8 +1,16 @@
-var buster = require("buster");
+var buster = require("buster-node");
+var assert = buster.assert;
+var refute = buster.refute;
 var cgroup = require("../lib/group");
 var fs = require("fs");
 var Path = require("path");
 var helper = require("./test-helper");
+
+function countdown(num, done) {
+    return function () {
+        if (--num == 0) { done(); }
+    };
+}
 
 function assertContainsResources(group, resources, done) {
     group.resolve().then(function (resourceSet) {
@@ -156,7 +164,7 @@ buster.testCase("configuration group", {
             sources: ["foo.js", "bar.js"]
         }, __dirname + "/fixtures");
 
-        var next = buster.countdown(2, done);
+        var next = countdown(2, done);
         assertContainsResources(group, ["/foo.js", "/bar.js"], next);
         assertLoad(group, ["/foo.js", "/bar.js"], next);
     },
@@ -186,7 +194,7 @@ buster.testCase("configuration group", {
         }, __dirname + "/fixtures");
 
         var paths = ["/foo.js", "/bar.js", "/test/my-testish.js"];
-        var callback = buster.countdown(2, done);
+        var callback = countdown(2, done);
 
         assertContainsResources(group, paths, callback);
         assertLoad(group, paths, callback);
@@ -199,7 +207,7 @@ buster.testCase("configuration group", {
         }, __dirname + "/fixtures");
 
         var paths = ["/test/my-testish.js", "/bar.js"];
-        var callback = buster.countdown(2, done);
+        var callback = countdown(2, done);
 
         assertContainsResources(group, paths, callback);
         assertLoad(group, paths, callback);

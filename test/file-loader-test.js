@@ -1,5 +1,7 @@
 var path = require("path");
-var buster = require("buster");
+var buster = require("buster-node");
+var assert = buster.assert;
+var refute = buster.refute;
 var bc = require("../lib/buster-configuration");
 var fileLoader = require("../lib/file-loader");
 var helper = require("./test-helper");
@@ -28,7 +30,7 @@ buster.testCase("File loader", {
 
     "fails if default config does not exist": function (done) {
         this.loader.load("", done(function (err, config) {
-            buster.log(err, config);
+            console.log(err, config, "\n");
             assert.defined(err);
             assert.match(err.message,
                          "No file provided, and none of\n" + "[" +

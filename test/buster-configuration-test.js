@@ -1,6 +1,8 @@
-var buster = require("buster");
+var buster = require("buster-node");
+var assert = buster.assert;
 var bc = require("../lib/buster-configuration");
 var helper = require("./test-helper");
+var events = require("events");
 
 buster.testCase("buster-configuration", {
     setUp: function () {
@@ -112,8 +114,8 @@ buster.testCase("buster-configuration", {
 
     "load events": {
         "delegates to groups": function () {
-            this.c.groups = [buster.eventEmitter.create(),
-                             buster.eventEmitter.create()];
+            this.c.groups = [new events.EventEmitter(),
+                             new events.EventEmitter()];
 
             var listener = this.spy();
             this.c.on("load:sources", listener);
@@ -137,8 +139,8 @@ buster.testCase("buster-configuration", {
 
     "framework events": {
         "delegates to groups": function () {
-            this.c.groups = [buster.eventEmitter.create(),
-                             buster.eventEmitter.create()];
+            this.c.groups = [new events.EventEmitter(),
+                             new events.EventEmitter()];
 
             var listener = this.spy();
             this.c.on("load:resources", listener);

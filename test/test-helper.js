@@ -1,4 +1,4 @@
-var buster = require("buster");
+var buster = require("buster-node");
 var rmrf = require("rimraf");
 var path = require("path");
 var fs = require("fs");
@@ -17,9 +17,9 @@ module.exports = {
             toString: function () { return this.content; }
         };
 
-        buster.assertions.add(name, {
+        buster.referee.add(name, {
             assert: function (expected) {
-                return buster.assertions.match(stream.toString(), expected);
+                return buster.referee.match(stream.toString(), expected);
             },
             assertMessage: "${2}Expected " + name + "\n${0}\nto match\n${1}",
             refuteMessage: "${2}Expected " + name +
@@ -66,7 +66,7 @@ module.exports = {
         }
         process.chdir(MODULE_ROOT);
         rmrf(FIXTURES_ROOT, function (err) {
-            if (err) { require("buster").log(err.toString()); }
+            if (err) { console.log(err.toString()); }
             done();
         });
     }

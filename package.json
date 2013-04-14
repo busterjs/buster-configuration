@@ -29,7 +29,7 @@
         "url": "https://github.com/busterjs/buster-configuration.git"
     },
     "scripts": {
-        "test": "./node_modules/buster/bin/buster-test"
+        "test": "node run-tests.js"
     },
     "dependencies": {
         "lodash": "~0.5",
@@ -40,7 +40,7 @@
         "bane": ">=0.1.0"
     },
     "devDependencies": {
-        "buster": "0.6.11",
+        "buster-node": "0.1",
         "rimraf": "~1"
     }
 }
