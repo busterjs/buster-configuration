@@ -94,6 +94,16 @@ buster.testCase("buster-configuration", {
             this.c.filterEnv(null).filterEnv({}).filterEnv(1234).filterEnv([]);
 
             assert.equals(this.c.groups.length, 2);
+        },
+
+        "filters groups without environment": function () {
+            this.c.addGroup("My group 1", this.node, this.rootPath);
+            this.c.addGroup("My group 2", {}, this.rootPath);
+            this.c.addGroup("My group 3", this.browser, this.rootPath);
+
+            this.c.filterEnv();
+
+            assert.equals(this.c.groups.length, 2);
         }
     },
 
