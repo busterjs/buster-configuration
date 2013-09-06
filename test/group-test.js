@@ -8,7 +8,7 @@ var helper = require("./test-helper");
 
 function countdown(num, done) {
     return function () {
-        if (--num == 0) { done(); }
+        if (--num === 0) { done(); }
     };
 }
 
@@ -284,9 +284,9 @@ buster.testCase("configuration group", {
             assert.equals(group.environment, "node");
         },
 
-        "defaults to browser": function () {
+        "defaults to nothing": function () {
             var group = cgroup.create({});
-            assert.equals(group.environment, "browser");
+            refute.defined(group.environment);
         },
 
         "is set via env shorthand": function () {
@@ -455,6 +455,7 @@ buster.testCase("configuration group", {
     "extended configuration": {
         setUp: function () {
             this.group = cgroup.create({
+                environment: "browser",
                 libs: ["foo.js"],
                 server: "localhost:9191",
                 autoRun: true
