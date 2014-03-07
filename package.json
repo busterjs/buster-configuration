@@ -44,7 +44,7 @@
         "bane": "~1.0"
     },
     "devDependencies": {
-        "buster-node": "0.1",
+        "buster-node": "*",
         "rimraf": "~1"
     }
 }
