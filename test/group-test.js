@@ -334,6 +334,20 @@ buster.testCase("configuration group", {
                     assert.equals(content, "Oh yeah!");
                 }));
             });
+        },
+
+        "extension resources are loaded after group.resolve": function (done) {
+            this.group.on("load:framework", function (resourceSet) {
+                resourceSet.addFileResource(
+                    Path.resolve(__dirname, "test-helper.js"),
+                    { path: "/test/test-helper.js" }
+                );
+            });
+
+            this.group.resolve().then(done(function (rs) {
+                assert.equals(rs.length, 1);
+                assert.defined(rs.get("/test/test-helper.js"));
+            }));
         }
     },
 
