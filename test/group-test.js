@@ -252,6 +252,18 @@ buster.testCase("configuration group", {
         assertLoad(group, ["/bar.js", "/foo.js", "/test/my-testish.js"], done);
     },
 
+    "convert testbed into resource path": function () {
+        var group = cgroup.create({
+            testbed: "testbed.html"
+        }, __dirname + "/fixtures");
+
+        group.resolve();
+
+        assert.equals(group.resources.length, 1);
+        assert.equals(group.resources[0].path, "/");
+        assert.equals(group.resources[0].file, "testbed.html");
+    },
+
     "server address": {
         "is parsed": function () {
             var group = cgroup.create({
