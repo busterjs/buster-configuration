@@ -599,6 +599,21 @@ buster.testCase("configuration group", {
         "overrides autoRun option": function () {
             var group = this.group.extend({ autoRun: false, libs: [] });
             refute(group.options.autoRun);
+        },
+
+        "clones resources array": function (done) {
+            var original = cgroup.create({
+            }, __dirname + "/fixtures");
+            var group = original.extend({
+                resources: ["foo.js"]
+            }, __dirname + "/fixtures");
+
+            original.resolve();
+            group.resolve().then(done(function (resourceSet) {
+                assert.equals(original.resources.length, 0);
+                assert.equals(group.resources.length, 1);
+            }));
+
         }
     },
 
