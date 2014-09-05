@@ -1,6 +1,6 @@
 {
     "name": "buster-configuration",
-    "version": "0.7.3",
+    "version": "0.7.4",
     "description": "Groks the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
