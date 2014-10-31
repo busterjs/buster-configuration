@@ -33,7 +33,7 @@
         "url": "https://github.com/busterjs/buster-configuration.git"
     },
     "bin": {
-        "buster": "./bin/buster-configuration"
+        "buster-configuration": "./bin/buster-configuration"
     },
     "scripts": {
         "test": "node run-tests.js",
