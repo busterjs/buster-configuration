@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+# Prints a given buster configuration file as JSON to the console.
+
+process.on("uncaughtException", function (err) {
+    console.log(err.stack);
+});
+
+var path = require("path");
+
+var bc = require("buster-configuration");
+console.log(process.argv[2]);
+var config = bc.loadConfigurationFile(process.argv[2]);
+console.log(JSON.stringify(config));
+

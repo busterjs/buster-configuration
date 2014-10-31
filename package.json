@@ -1,6 +1,6 @@
 {
     "name": "buster-configuration",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "description": "Groks the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
     "homepage": "http://busterjs.org/buster-configuration",
     "author": {
@@ -31,6 +31,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/busterjs/buster-configuration.git"
+    },
+    "bin": {
+        "buster": "./bin/buster-configuration"
     },
     "scripts": {
         "test": "node run-tests.js",
