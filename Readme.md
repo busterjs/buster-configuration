@@ -9,6 +9,10 @@ Load and interact with Buster.JS configuration files.
 
 ##Changelog
 
+**0.7.6** (13.11.2014)
+
+* Type of comment changed in binary to print given configuration file as JSON to console. [Feature request #388](https://github.com/busterjs/buster/issues/388)
+
 **0.7.5** (31.10.2014)
 
 * Binary added to print given configuration file as JSON to console. [Feature request #388](https://github.com/busterjs/buster/issues/388)
