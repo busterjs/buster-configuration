@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-# Prints a given buster configuration file as JSON to the console.
+// Prints a given buster configuration file as JSON to the console.
 
 process.on("uncaughtException", function (err) {
     console.log(err.stack);
