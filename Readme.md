@@ -7,7 +7,7 @@
 Load and interact with Buster.JS configuration files.
 
 
-##Changelog
+## Changelog
 
 **0.7.6** (13.11.2014)
 
