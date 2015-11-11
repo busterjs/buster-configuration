@@ -46,7 +46,7 @@
     "dependencies": {
         "lodash": "3.x",
         "when": "3.x",
-        "async": "0.1.x",
+        "async": "1.x",
         "ramp-resources": "1.x",
         "glob": "5.x",
         "bane": "1.x"

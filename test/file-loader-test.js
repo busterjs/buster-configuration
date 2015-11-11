@@ -87,7 +87,7 @@ buster.testCase("File loader", {
             helper.mkdir("somewhere/nested/place");
             this.assertConfigLoaded = function (done) {
                 this.loader.load([], done(function (err, config) {
-                    refute.defined(err);
+                    assert.isNull(err);
                 }));
             };
         },
