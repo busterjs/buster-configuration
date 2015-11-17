@@ -257,11 +257,11 @@ buster.testCase("configuration group", {
             testbed: "testbed.html"
         }, __dirname + "/fixtures");
 
-        group.resolve();
-
-        assert.equals(group.resources.length, 1);
-        assert.equals(group.resources[0].path, "/");
-        assert.equals(group.resources[0].file, "testbed.html");
+        return group.resolve().then(function () {
+            assert.equals(group.resources.length, 1);
+            assert.equals(group.resources[0].path, "/");
+            assert.equals(group.resources[0].file, "testbed.html");
+        });
     },
 
     "server address": {

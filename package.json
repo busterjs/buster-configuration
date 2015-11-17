@@ -28,6 +28,7 @@
         "url": "http://jodal.no"
     }],
     "main": "./lib/buster-configuration",
+    "license": "BSD-3-Clause",
     "repository": {
         "type": "git",
         "url": "https://github.com/busterjs/buster-configuration.git"
@@ -39,16 +40,19 @@
         "test": "node run-tests.js",
         "test-debug": "node --debug-brk run-tests.js"
     },
+    "engines": {
+        "node": ">= 4"
+    },
     "dependencies": {
-        "lodash": "~1.0",
-        "when": "https://github.com/cujojs/when/tarball/1.3.0",
-        "async": "~0.1",
-        "ramp-resources": "~1.0",
-        "glob": "~3.1",
-        "bane": "~1.0"
+        "lodash": "3.x",
+        "when": "3.x",
+        "async": "1.x",
+        "ramp-resources": "2.x",
+        "glob": "5.x",
+        "bane": "1.x"
     },
     "devDependencies": {
-        "buster-node": "*",
-        "rimraf": "~1"
+        "buster-node": "0.7.x",
+        "rimraf": "2.x"
     }
 }

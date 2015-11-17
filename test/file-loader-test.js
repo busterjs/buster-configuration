@@ -30,7 +30,6 @@ buster.testCase("File loader", {
 
     "fails if default config does not exist": function (done) {
         this.loader.load("", done(function (err, config) {
-            console.log(err, config, "\n");
             assert.defined(err);
             assert.match(err.message,
                          "No file provided, and none of\n" + "[" +
@@ -87,7 +86,7 @@ buster.testCase("File loader", {
             helper.mkdir("somewhere/nested/place");
             this.assertConfigLoaded = function (done) {
                 this.loader.load([], done(function (err, config) {
-                    refute.defined(err);
+                    assert.isNull(err);
                 }));
             };
         },
