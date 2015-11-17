@@ -1,58 +1,64 @@
 {
-    "name": "buster-configuration",
-    "version": "0.7.6",
-    "description": "Groks the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
-    "homepage": "http://busterjs.org/buster-configuration",
-    "author": {
-        "name": "Christian Johansen",
-        "email": "christian@cjohansen.no",
-        "url": "http://cjohansen.no"
+  "name": "buster-configuration",
+  "version": "0.8.0",
+  "description": "Groks the buster.js configuration file, including resource loading, file globbing, grouped test configs and more",
+  "homepage": "http://busterjs.org/buster-configuration",
+  "author": {
+    "name": "Christian Johansen",
+    "email": "christian@cjohansen.no",
+    "url": "http://cjohansen.no"
+  },
+  "contributors": [
+    {
+      "name": "August Lilleaas",
+      "email": "august.lilleaas@gmail.com",
+      "url": "http://augustl.com"
     },
-    "contributors": [{
-        "name": "August Lilleaas",
-        "email": "august.lilleaas@gmail.com",
-        "url": "http://augustl.com"
-    }, {
-        "name": "Daniel Wittner",
-        "email": "d.wittner@gmx.de",
-        "url": "https://github.com/dwittner"
-    }, {
-        "name": "Elliot Winkler",
-        "email": "elliot.winkler@gmail.com"
-    }, {
-        "name": "Sam Riley",
-        "email": "samriley@hotmail.co.uk"
-    }, {
-        "name": "Stein Magnus Jodal",
-        "email": "stein.magnus@jodal.no",
-        "url": "http://jodal.no"
-    }],
-    "main": "./lib/buster-configuration",
-    "license": "BSD-3-Clause",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/busterjs/buster-configuration.git"
+    {
+      "name": "Daniel Wittner",
+      "email": "d.wittner@gmx.de",
+      "url": "https://github.com/dwittner"
     },
-    "bin": {
-        "buster-configuration": "./bin/buster-configuration"
+    {
+      "name": "Elliot Winkler",
+      "email": "elliot.winkler@gmail.com"
     },
-    "scripts": {
-        "test": "node run-tests.js",
-        "test-debug": "node --debug-brk run-tests.js"
+    {
+      "name": "Sam Riley",
+      "email": "samriley@hotmail.co.uk"
     },
-    "engines": {
-        "node": ">= 4"
-    },
-    "dependencies": {
-        "lodash": "3.x",
-        "when": "3.x",
-        "async": "1.x",
-        "ramp-resources": "2.x",
-        "glob": "5.x",
-        "bane": "1.x"
-    },
-    "devDependencies": {
-        "buster-node": "0.7.x",
-        "rimraf": "2.x"
+    {
+      "name": "Stein Magnus Jodal",
+      "email": "stein.magnus@jodal.no",
+      "url": "http://jodal.no"
     }
+  ],
+  "main": "./lib/buster-configuration",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/busterjs/buster-configuration.git"
+  },
+  "bin": {
+    "buster-configuration": "./bin/buster-configuration"
+  },
+  "scripts": {
+    "test": "node run-tests.js",
+    "test-debug": "node --debug-brk run-tests.js"
+  },
+  "engines": {
+    "node": ">= 4"
+  },
+  "dependencies": {
+    "lodash": "3.x",
+    "when": "3.x",
+    "async": "1.x",
+    "ramp-resources": "2.x",
+    "glob": "5.x",
+    "bane": "1.x"
+  },
+  "devDependencies": {
+    "buster-node": "0.7.x",
+    "rimraf": "2.x"
+  }
 }
