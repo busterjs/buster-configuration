@@ -9,7 +9,7 @@ Load and interact with Buster.JS configuration files.
 
 ## Changelog
 
-**0.8.0** (2015-Nov-17)
+**0.8.1** (2015-Nov-26)
 
 * Dependency updates, incl. majors for `lodash`, `when`, `async`, `ramp-resources`, `glob`
 
